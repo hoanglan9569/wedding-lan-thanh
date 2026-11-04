@@ -10,9 +10,12 @@ export const isCoarse = window.matchMedia('(pointer: coarse)').matches;
 
 let lenis: Lenis | null = null;
 
-/** Cuộn mượt trên chuột; trên cảm ứng giữ cuộn gốc của hệ điều hành cho nhẹ máy. */
+/**
+ * Cuộn mượt chỉ bật cho chuột. Trên điện thoại dùng cuộn gốc của hệ điều hành:
+ * nhẹ máy hơn và không có thư viện nào chen vào giữa thao tác vuốt.
+ */
 export function initSmoothScroll(): void {
-  if (reduceMotion) return;
+  if (reduceMotion || isCoarse) return;
   lenis = new Lenis({
     duration: 1.1,
     lerp: 0.11,
@@ -70,47 +73,54 @@ function revealTargets(el: HTMLElement, kind: RevealKind): Element[] | HTMLEleme
   return kids.length ? kids : el;
 }
 
+/**
+ * Hiệu ứng xuất hiện chạy bằng IntersectionObserver chứ không bám ScrollTrigger:
+ * cuộn kiểu gì (chuột, chạm, phím, nhảy tới mục) chữ cũng luôn hiện ra.
+ */
+function onFirstSight(el: HTMLElement, run: () => void): void {
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      io.disconnect();
+      run();
+    },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0 },
+  );
+  io.observe(el);
+}
+
 function setupReveal(el: HTMLElement): void {
   const kind = (el.dataset.reveal || 'fade') as RevealKind;
   const vars = FROM[kind] ?? FROM.fade;
   const targets = revealTargets(el, kind);
   gsap.set(targets, { ...vars, duration: 0 });
-  ScrollTrigger.create({
-    trigger: el,
-    start: 'top 88%',
-    once: true,
-    onEnter: () => {
-      gsap.to(targets, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        rotateX: 0,
-        clipPath: 'inset(0% 0% 0% 0% round 2px)',
-        duration: (vars.duration as number) ?? 1,
-        ease: 'power3.out',
-        stagger: (vars.stagger as number) ?? 0,
-        clearProps: 'clipPath,transformPerspective',
-      });
-    },
+  onFirstSight(el, () => {
+    gsap.to(targets, {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      rotateX: 0,
+      clipPath: 'inset(0% 0% 0% 0% round 2px)',
+      duration: (vars.duration as number) ?? 1,
+      ease: 'power3.out',
+      stagger: (vars.stagger as number) ?? 0,
+      clearProps: 'clipPath,transformPerspective',
+    });
   });
 }
 
 function setupSplit(el: HTMLElement): void {
   const split = new SplitText(el, { type: 'chars' });
   gsap.set(split.chars, { yPercent: 118, opacity: 0 });
-  ScrollTrigger.create({
-    trigger: el,
-    start: 'top 92%',
-    once: true,
-    onEnter: () =>
-      gsap.to(split.chars, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 1.15,
-        ease: 'power4.out',
-        stagger: 0.035,
-      }),
-  });
+  onFirstSight(el, () =>
+    gsap.to(split.chars, {
+      yPercent: 0,
+      opacity: 1,
+      duration: 1.15,
+      ease: 'power4.out',
+      stagger: 0.035,
+    }),
+  );
 }
 
 export function initReveals(): void {

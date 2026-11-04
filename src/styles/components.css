@@ -65,13 +65,14 @@
   --btn-fill-fg: var(--paper);
 }
 
+/* Chỉ đổi màu nền, không dùng cách viết tắt `background` vì nó xoá luôn lớp nền chạy lên */
 .btn--ghost {
-  background: rgba(252, 250, 247, 0.72);
+  background-color: rgba(252, 250, 247, 0.72);
   backdrop-filter: blur(8px);
 }
 
 .btn--line {
-  background: transparent;
+  background-color: transparent;
 }
 
 .btnrow {

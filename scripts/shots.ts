@@ -64,14 +64,33 @@ async function openCard(page: Page): Promise<void> {
 
 /** Cuộn hết trang một lượt để mọi hiệu ứng xuất hiện đã chạy xong. */
 async function warmUp(page: Page): Promise<void> {
+  // Lăn chuột thật (Lenis chỉ nhận wheel) và cả scrollTo cho ngữ cảnh cảm ứng.
   const height = await page.evaluate(() => document.body.scrollHeight);
-  for (let y = 0; y < height; y += 360) {
+  for (let y = 0; y < height; y += 320) {
+    await page.mouse.wheel(0, 320);
     await page.evaluate((top) => window.scrollTo(0, top), y);
-    await page.waitForTimeout(130);
+    await page.waitForTimeout(110);
   }
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1200);
+  await page.mouse.wheel(0, -height - 2000);
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(900);
+}
+
+/** Sau khi cuộn hết trang, không phần tử nào được phép còn mờ. */
+async function stillHidden(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const bad: string[] = [];
+    document.querySelectorAll<HTMLElement>('[data-reveal], [data-split]').forEach((el) => {
+      const nodes = el.dataset.reveal === 'stagger' ? Array.from(el.children) : [el];
+      for (const node of nodes) {
+        const style = getComputedStyle(node as HTMLElement);
+        const opacity = Number.parseFloat(style.opacity);
+        if (opacity < 0.9) bad.push(`${node.nodeName}.${(node as HTMLElement).className} = ${opacity}`);
+      }
+    });
+    return bad.slice(0, 10);
+  });
 }
 
 async function shootSections(page: Page, view: string): Promise<string[]> {
@@ -110,6 +129,8 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   await page.screenshot({ path: `${outDir}/${view}-intro.jpg`, quality: 72, type: 'jpeg' });
   await openCard(page);
   await warmUp(page);
+  const hidden = await stillHidden(page);
+  checks.push(`còn mờ sau khi cuộn: ${hidden.length ? hidden.join(' | ') : 'không có'}`);
   const shots = await shootSections(page, view);
 
   const overflow = await page.evaluate(
