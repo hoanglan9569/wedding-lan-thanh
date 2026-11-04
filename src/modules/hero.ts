@@ -9,8 +9,8 @@ export function initHero(): void {
 
   if (image) {
     gsap.to(image, {
-      scale: 1.14,
-      duration: 18,
+      scale: 1.1,
+      duration: 20,
       ease: 'none',
       repeat: -1,
       yoyo: true,
