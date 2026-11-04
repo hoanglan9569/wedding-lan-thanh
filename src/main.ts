@@ -1,6 +1,10 @@
 import './styles/base.css';
 import './styles/components.css';
+import './styles/intro.css';
+import './styles/lightbox.css';
 import './styles/sections.css';
+import './styles/sections-couple.css';
+import './styles/sections-info.css';
 import './styles/ornaments.css';
 
 import { initSmoothScroll, initReveals, initAnchors, lockScroll, refreshScroll } from './modules/scroll';

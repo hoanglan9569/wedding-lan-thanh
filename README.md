@@ -135,6 +135,12 @@ Script báo lỗi console và tràn ngang; cần Playwright (`bun add -d playwri
 
 ## Kỹ thuật
 
-Vite 8 + TypeScript 7, GSAP 3.15 (ScrollTrigger, SplitText), Lenis 1.3, phông tự host
-(Cormorant Garamond, Be Vietnam Pro, Dancing Script - đủ dấu tiếng Việt).
-Mọi hiệu ứng tôn trọng `prefers-reduced-motion`; canvas cánh hoa tự dừng khi rời màn hình hoặc ẩn tab.
+Vite 8 + TypeScript 7, GSAP 3.15 (ScrollTrigger, SplitText), Lenis 1.3 (chỉ bật cho chuột; điện thoại
+dùng cuộn gốc của hệ điều hành), phông tự host: Playfair Display + Be Vietnam Pro + Dancing Script.
+
+- Hiệu ứng xuất hiện chạy bằng IntersectionObserver nên cuộn kiểu gì chữ cũng hiện ra, và tôn trọng
+  `prefers-reduced-motion`; canvas cánh hoa tự dừng khi rời màn hình hoặc ẩn tab.
+- Tranh trang trí chỉ tải sau khi mở thiệp (`html.is-open`): lần đầu vào trang khoảng 630 KB.
+- Ngày giờ luôn dùng phông không chân vì chữ số 1 của phông có chân trông giống chữ I hoa.
+- `bun scripts/shots.ts` đo sẵn: tràn ngang, lỗi console, phần tử còn mờ, tương phản WCAG
+  (hiện 6.4-7.4:1) và dấu tiếng Việt chồng hai tầng.
