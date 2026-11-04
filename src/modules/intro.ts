@@ -13,38 +13,82 @@ function finish(overlay: HTMLElement): void {
   if (musicWanted()) void startMusic();
 }
 
-/** Màn "Mở thiệp": mở ra như tách hai cánh giấy rồi hiện hero. */
+/** Bẻ dấu niêm phong, mở nắp, rút tấm thiệp lên rồi tan vào ảnh cưới. */
+function openSequence(overlay: HTMLElement, done: () => void): void {
+  const flap = overlay.querySelector<HTMLElement>('#env-flap');
+  const card = overlay.querySelector<HTMLElement>('#env-card');
+  const seal = overlay.querySelector<HTMLElement>('#intro-open');
+  const hint = overlay.querySelector<HTMLElement>('#intro-hint');
+  const front = overlay.querySelector<HTMLElement>('.env__front');
+
+  const tl = gsap.timeline({ onComplete: done, defaults: { overwrite: 'auto' } });
+  tl.to(hint, { opacity: 0, duration: 0.3, ease: 'power1.out' }, 0)
+    .to(seal, { scale: 1.16, rotate: -9, duration: 0.24, ease: 'power2.out' }, 0)
+    .to(seal, { scale: 0.82, rotate: 12, y: 22, opacity: 0, duration: 0.46, ease: 'power2.in' }, 0.24)
+    .to(flap, { rotateX: -172, duration: 1, ease: 'power2.inOut' }, 0.38)
+    .set(flap, { zIndex: 1 }, 0.84)
+    .to(front, { opacity: 0, duration: 0.5, ease: 'power1.out' }, 0.55)
+    .to(card, { yPercent: -62, scale: 1.03, duration: 1.1, ease: 'power3.out' }, 1)
+    .set(card, { zIndex: 7 }, '+=0.25')
+    .to(card, { scale: 1.32, duration: 0.95, ease: 'power2.in' }, '+=0.05')
+    .to(overlay, { opacity: 0, duration: 0.75, ease: 'power2.inOut' }, '<0.2');
+}
+
+function entrance(overlay: HTMLElement): void {
+  const env = overlay.querySelector<HTMLElement>('#env');
+  const hint = overlay.querySelector<HTMLElement>('#intro-hint');
+  gsap.from(env, { opacity: 0, y: 40, scale: 0.94, duration: 1.2, ease: 'power3.out', delay: 0.12 });
+  gsap.from(hint, { opacity: 0, y: 12, duration: 0.9, ease: 'power2.out', delay: 0.8 });
+}
+
+/** Mở được bằng ba cách: bấm dấu niêm phong, cuộn xuống, hoặc bàn phím. */
+function bindOpeners(overlay: HTMLElement, open: () => void): () => void {
+  const seal = overlay.querySelector<HTMLElement>('#intro-open');
+  let touchStart = 0;
+
+  const onWheel = (event: WheelEvent): void => {
+    if (event.deltaY > 6) open();
+  };
+  const onTouchStart = (event: TouchEvent): void => {
+    touchStart = event.touches[0]?.clientY ?? 0;
+  };
+  const onTouchMove = (event: TouchEvent): void => {
+    const y = event.touches[0]?.clientY ?? 0;
+    if (touchStart - y > 22) open();
+  };
+  const onKey = (event: KeyboardEvent): void => {
+    if ([' ', 'Spacebar', 'ArrowDown', 'PageDown', 'Enter'].includes(event.key)) open();
+  };
+
+  seal?.addEventListener('click', open);
+  window.addEventListener('wheel', onWheel, { passive: true });
+  window.addEventListener('touchstart', onTouchStart, { passive: true });
+  window.addEventListener('touchmove', onTouchMove, { passive: true });
+  window.addEventListener('keydown', onKey);
+
+  return () => {
+    seal?.removeEventListener('click', open);
+    window.removeEventListener('wheel', onWheel);
+    window.removeEventListener('touchstart', onTouchStart);
+    window.removeEventListener('touchmove', onTouchMove);
+    window.removeEventListener('keydown', onKey);
+  };
+}
+
 export function initIntro(): void {
   const overlay = document.querySelector<HTMLElement>('#intro');
-  const button = document.querySelector<HTMLButtonElement>('#intro-open');
-  if (!overlay || !button) return;
+  if (!overlay) return;
 
   lockScroll(true);
+  if (!reduceMotion) entrance(overlay);
 
-  if (reduceMotion) {
-    button.addEventListener('click', () => finish(overlay));
-    return;
-  }
-
-  const paper = overlay.querySelector<HTMLElement>('.intro__paper');
-  gsap.from(paper, { opacity: 0, y: 34, scale: 0.97, duration: 1.1, ease: 'power3.out', delay: 0.15 });
-  gsap.from(overlay.querySelectorAll('.intro__paper > *'), {
-    opacity: 0,
-    y: 18,
-    duration: 0.9,
-    stagger: 0.09,
-    ease: 'power3.out',
-    delay: 0.35,
-  });
-
-  button.addEventListener(
-    'click',
-    () => {
-      const tl = gsap.timeline({ onComplete: () => finish(overlay) });
-      tl.to(paper, { y: -26, scale: 1.03, duration: 0.5, ease: 'power2.out' })
-        .to(paper, { opacity: 0, y: -60, duration: 0.6, ease: 'power2.in' }, '>-0.1')
-        .to(overlay, { opacity: 0, duration: 0.7, ease: 'power2.inOut' }, '<0.1');
-    },
-    { once: true },
-  );
+  let opened = false;
+  const open = (): void => {
+    if (opened) return;
+    opened = true;
+    unbind();
+    if (reduceMotion) finish(overlay);
+    else openSequence(overlay, () => finish(overlay));
+  };
+  const unbind = bindOpeners(overlay, open);
 }

@@ -115,7 +115,6 @@ export function initRsvp(): void {
   const status = document.querySelector<HTMLElement>('#rsvp-status');
   if (!form) return;
 
-  renderWishes(readLocal());
   toggleGuests(form);
   form.querySelectorAll('input[name="attend"]').forEach((input) => {
     input.addEventListener('change', () => toggleGuests(form));
@@ -135,7 +134,6 @@ export function initRsvp(): void {
 
     const list = [...readLocal(), reply];
     writeLocal(list);
-    renderWishes(list);
 
     const button = form.querySelector<HTMLButtonElement>('#rsvp-submit');
     if (button) {
@@ -144,10 +142,13 @@ export function initRsvp(): void {
     }
     if (status) {
       status.className = 'form__status';
-      status.textContent =
+      const defaultText =
         reply.attend === 'Có'
           ? `Cảm ơn ${reply.name}! Hẹn gặp bạn ngày 29.11.2026 nhé.`
           : `Cảm ơn ${reply.name} đã phản hồi, tụi mình sẽ nhớ bạn trong ngày vui.`;
+      status.textContent = reply.wish.trim()
+        ? `Cảm ơn ${reply.name}! Lời chúc của bạn sẽ hiện ra sau khi gia đình duyệt.`
+        : defaultText;
     }
 
     void send(reply).then((ok) => {

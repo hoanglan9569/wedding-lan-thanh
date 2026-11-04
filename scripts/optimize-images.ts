@@ -105,20 +105,6 @@ async function processMap(
   return results;
 }
 
-async function processInvitation(
-  input: string,
-  slug: string
-): Promise<GeneratedFile[]> {
-  const results: GeneratedFile[] = [];
-  const widths = [900, 1400, 2000];
-
-  for (const w of widths) {
-    const out = path.join('public', 'invitation', `${slug}-${w}.webp`);
-    results.push(await writeWebp(input, out, w, 86, 5));
-  }
-  return results;
-}
-
 async function processOg(
   input: string,
   outPath: string
@@ -170,7 +156,6 @@ async function main(): Promise<void> {
   await ensureDirs([
     path.join('public', 'photos'),
     path.join('public', 'map'),
-    path.join('public', 'invitation'),
     path.join('src', 'data'),
   ]);
 
@@ -181,20 +166,15 @@ async function main(): Promise<void> {
     { input: path.join('assets-src', 'originals', 'VAN09249.jpg'), slug: 'van09249' },
   ];
   const mapItem = { input: path.join('assets-src', 'map-kim-center.jpg'), slug: 'map-kim-center' };
-  const invitationItem = {
-    input: path.join('assets-src', 'invitation-nha-trai.jpg'),
-    slug: 'invitation-nha-trai',
-  };
   const ogInput = path.join('assets-src', 'originals', 'VAN06795.jpg');
   const ogOut = path.join('public', 'og.jpg');
 
   const allGenerated: GeneratedFile[] = [];
   allGenerated.push(...(await processPhotos(photos)));
   allGenerated.push(...(await processMap(mapItem.input, mapItem.slug)));
-  allGenerated.push(...(await processInvitation(invitationItem.input, invitationItem.slug)));
   allGenerated.push(await processOg(ogInput, ogOut));
 
-  await buildManifest([...photos, mapItem, invitationItem]);
+  await buildManifest([...photos, mapItem]);
 
   let totalBytes = 0;
   for (const file of allGenerated) {

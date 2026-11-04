@@ -74,16 +74,61 @@ async function openCard(page: Page): Promise<void> {
 /** Cuộn hết trang một lượt để mọi hiệu ứng xuất hiện đã chạy xong. */
 async function warmUp(page: Page): Promise<void> {
   // Lăn chuột thật (Lenis chỉ nhận wheel) và cả scrollTo cho ngữ cảnh cảm ứng.
-  const height = await page.evaluate(() => document.body.scrollHeight);
-  for (let y = 0; y < height; y += 320) {
+  // Trang cao dần khi ảnh tải xong nên phải đo lại mỗi vòng, không tính trước.
+  for (let step = 0; step < 80; step += 1) {
+    const atBottom = await page.evaluate((delta) => {
+      window.scrollBy(0, delta);
+      return window.scrollY + window.innerHeight >= document.body.scrollHeight - 4;
+    }, 320);
     await page.mouse.wheel(0, 320);
-    await page.evaluate((top) => window.scrollTo(0, top), y);
     await page.waitForTimeout(110);
+    if (atBottom) break;
   }
   await page.waitForTimeout(1200);
-  await page.mouse.wheel(0, -height - 2000);
+  await page.mouse.wheel(0, -40000);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(900);
+}
+
+/** Đo tương phản chữ trên nền theo công thức WCAG: dễ đọc mà không chói. */
+async function contrast(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const picks = [
+      '.letter__text p',
+      '.card__when p',
+      '.tl__addr',
+      '.rsvp__note',
+      '.person__parents',
+      '.eyebrow',
+      '.cd__lbl',
+      '.field label',
+    ];
+    const nums = (value: string): number[] => (value.match(/\d+(\.\d+)?/g) ?? []).map(Number);
+    const lum = (rgb: number[]): number => {
+      const [r = 0, g = 0, b = 0] = rgb.map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const backdrop = (el: Element): number[] => {
+      let node: Element | null = el;
+      while (node) {
+        const bg = getComputedStyle(node).backgroundColor;
+        if (bg && !bg.startsWith('rgba(0, 0, 0, 0')) return nums(bg);
+        node = node.parentElement;
+      }
+      return [255, 255, 255];
+    };
+    return picks.flatMap((sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return [];
+      const a = lum(nums(getComputedStyle(el).color));
+      const b = lum(backdrop(el));
+      const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      return [`${sel} ${ratio.toFixed(1)}:1`];
+    });
+  });
 }
 
 /** Sau khi cuộn hết trang, không phần tử nào được phép còn mờ. */
@@ -140,6 +185,7 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   await warmUp(page);
   const hidden = await stillHidden(page);
   checks.push(`còn mờ sau khi cuộn: ${hidden.length ? hidden.join(' | ') : 'không có'}`);
+  checks.push(`tương phản: ${(await contrast(page)).join(' · ')}`);
   // Tắt cuộn mượt: nó giành quyền cuộn với trình chụp nên ảnh ghép bị lệch.
   await page.evaluate(() => (window as unknown as { __lenis?: { destroy(): void } }).__lenis?.destroy());
   await page.waitForTimeout(300);

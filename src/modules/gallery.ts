@@ -164,14 +164,4 @@ export function initGallery(onToggle: (open: boolean) => void): void {
       },
     ]);
   });
-
-  document.querySelector('#view-original')?.addEventListener('click', () => {
-    box.open([
-      {
-        src: asset('invitation/invitation-nha-trai-2000.webp'),
-        alt: 'Thiệp cưới giấy',
-        caption: 'Thiệp giấy · Nhà Trai',
-      },
-    ]);
-  });
 }

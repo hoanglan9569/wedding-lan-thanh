@@ -20,7 +20,7 @@ bun run typecheck
 
 | Phần | Nội dung |
 | --- | --- |
-| Màn mở thiệp | Tên khách mời lấy từ đường dẫn, nút "Mở thiệp", bật nhạc nền |
+| Màn mở thiệp | Phong bì có dấu niêm phong: bẻ dấu, mở nắp, tấm thiệp trượt lên rồi tan vào ảnh cưới. Mở được bằng cách chạm dấu niêm phong, cuộn xuống hoặc nhấn phím. Tên khách lấy từ đường dẫn |
 | Hero | Ảnh cưới toàn màn hình, ken burns + parallax, mưa cánh sen trên canvas |
 | Đếm ngược | Đếm tới 11:00 ngày 29.11.2026, nút tải `.ics` và Google Calendar |
 | Lời ngỏ | Thư ngỏ gửi khách mời |
@@ -29,7 +29,8 @@ bun run typecheck
 | Chương trình | Mốc 09:00 và 11:00, nút chỉ đường từng nơi |
 | Album | 4 ảnh, lightbox có phím mũi tên và vuốt trên điện thoại |
 | Địa điểm | Bản đồ giấy (bấm để phóng to), nút mở Google Maps |
-| Xác nhận tham dự | Form RSVP + sổ lưu bút lời chúc |
+| Xác nhận tham dự | Form RSVP gửi thẳng về Cloudflare Worker |
+| Sổ lưu bút | Chỉ hiện lời chúc đã được gia đình duyệt |
 
 ### Mời riêng từng khách
 
@@ -73,13 +74,21 @@ Kết quả nằm trong `public/photos`, `public/map`, `public/invitation` và `
 thuộc phạm vi công cộng. Nguồn và giấy phép: `public/audio/CREDITS.md`.
 Đổi bài: thay tệp đó rồi sửa `music.src` trong `src/data/wedding.ts`.
 
-## RSVP
+## RSVP và duyệt lời chúc
 
-Khách bấm gửi thì phản hồi đi hai nơi: hiện ngay ở phần "Lời chúc" trên máy khách, và gửi về
-Cloudflare Worker `lanthanh-rsvp` (https://lanthanh-rsvp.hoanglan9569.workers.dev) lưu trong KV.
-Worker không có đường nào đọc ngược dữ liệu ra, nên không cần mật khẩu nào cả.
+Khách gửi phản hồi thì bản ghi vào Cloudflare Worker `lanthanh-rsvp`
+(https://lanthanh-rsvp.hoanglan9569.workers.dev) với trạng thái `pending`. Trang chỉ hiển thị lời chúc
+đã `approved`, nên không ai đăng bậy lên trang được.
 
-Đọc phản hồi trên máy đã đăng nhập wrangler:
+**Trang duyệt: https://lanthanh.pages.dev/admin.html**
+
+- Lần đầu vào sẽ hỏi đặt mật khẩu (ít nhất 8 ký tự). Worker chỉ lưu bản băm SHA-256 kèm muối,
+  không lưu mật khẩu gốc, và khoá IP 10 phút sau 10 lần nhập sai.
+- Mỗi lời chúc có nút **Duyệt**, **Ẩn**, **Lưu sửa** (sửa chữ trong ô văn bản) và **Xoá**.
+- Quên mật khẩu: xoá khoá `admin:auth` rồi đặt lại
+  (`cd worker && bunx wrangler kv key delete "admin:auth" --binding RSVP --remote`).
+
+Đọc thẳng dữ liệu từ máy đã đăng nhập wrangler:
 
 ```bash
 bun run rsvp:list                                   # liệt kê các khoá reply:...
@@ -89,6 +98,19 @@ cd worker && bunx wrangler kv key get "<khoá>" --binding RSVP --remote
 Mã nguồn và hướng dẫn: `worker/` (`bun run rsvp:deploy` để đẩy lại).
 Đổi chỗ nhận: đặt `VITE_RSVP_ENDPOINT=https://...` trong `.env`.
 Endpoint nhận `POST` JSON: `{ name, side, attend, guests, wish, at }`.
+
+## Tranh trang trí
+
+`public/art/*.webp` là tranh màu nước do Krea 2 vẽ (hoa sen, lá bạch đàn, cánh hoa rơi, dấu niêm phong),
+đã tách nền trong suốt. Bản gốc nằm ở `assets-src/art/`. Vẽ lại hoặc thay tranh thì chép vào
+`assets-src/art/` đúng tên rồi chạy:
+
+```bash
+bun run optimize:art
+```
+
+Các tranh được đặt bằng nền CSS trong `src/styles/ornaments.css`: thiếu tệp nào thì chỗ đó chỉ trống,
+bố cục không vỡ.
 
 ## Đưa lên mạng
 

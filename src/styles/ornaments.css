@@ -1,0 +1,144 @@
+/* ================================================================
+   Điểm nhấn hình ảnh: tranh màu nước do Krea 2 vẽ, đặt bằng nền CSS
+   nên thiếu tệp nào thì chỗ đó chỉ đơn giản là trống, không vỡ bố cục.
+   ================================================================ */
+
+.countdown,
+.letter,
+.pair,
+.invite,
+.events,
+.venue,
+.rsvp,
+.footer {
+  overflow: hidden;
+}
+
+/* Cánh hoa rơi nối ảnh cưới xuống phần đếm ngược */
+.countdown::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(120px, 17vw, 200px);
+  background: url('/art/petal-fall.webp') no-repeat center top / cover;
+  opacity: 0.4;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 18%, transparent 100%);
+  mask-image: linear-gradient(#000 18%, transparent 100%);
+}
+
+/* Nhành sen góc dưới bên trái của lời ngỏ */
+.letter::before {
+  content: '';
+  position: absolute;
+  left: -3%;
+  bottom: -5%;
+  width: min(44vw, 400px);
+  aspect-ratio: 1;
+  background: url('/art/corner-spray.webp') no-repeat left bottom / contain;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Nhành sen lật ngược ở góc trên bên phải phần cô dâu chú rể */
+.pair::before {
+  content: '';
+  position: absolute;
+  right: -4%;
+  top: -2%;
+  width: min(38vw, 340px);
+  aspect-ratio: 1;
+  background: url('/art/corner-spray.webp') no-repeat right top / contain;
+  opacity: 0.32;
+  transform: scaleX(-1) rotate(180deg);
+  pointer-events: none;
+}
+
+/* Vòng hoa sau dấu & giữa hai người */
+.pair__amp {
+  position: relative;
+}
+
+.pair__amp::before {
+  content: '';
+  position: absolute;
+  inset: -135% -75%;
+  background: url('/art/wreath.webp') no-repeat center / contain;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Vòng hoa mờ trên đầu tấm thiệp */
+.card3d__inner::before {
+  content: '';
+  position: absolute;
+  top: -3%;
+  left: 50%;
+  translate: -50% 0;
+  width: 66%;
+  aspect-ratio: 1;
+  background: url('/art/wreath.webp') no-repeat center top / contain;
+  opacity: 0.26;
+  pointer-events: none;
+}
+
+/* Đường hoa ngăn mục */
+.events::before,
+.venue::before,
+.rsvp::before {
+  content: '';
+  position: absolute;
+  top: clamp(1.5rem, 4vw, 3.2rem);
+  left: 50%;
+  translate: -50% 0;
+  width: min(76vw, 500px);
+  height: clamp(46px, 7vw, 84px);
+  background: url('/art/divider.webp') no-repeat center / contain;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.events,
+.venue,
+.rsvp {
+  padding-top: calc(var(--section-y) + clamp(2.2rem, 5vw, 4rem));
+}
+
+/* Cánh hoa phủ nhẹ trên chân trang xanh */
+.footer::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(100px, 14vw, 170px);
+  background: url('/art/petal-fall.webp') no-repeat center top / cover;
+  opacity: 0.14;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000, transparent);
+  mask-image: linear-gradient(#000, transparent);
+}
+
+.footer > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Màn mở thiệp: vòng hoa in chìm sau tên hai người */
+.env__wreath {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .countdown::before,
+  .footer::before {
+    animation: driftY 26s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes driftY {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-2%, 8px, 0);
+  }
+}

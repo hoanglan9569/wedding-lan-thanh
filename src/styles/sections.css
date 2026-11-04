@@ -169,7 +169,7 @@
 
 /* ================= ĐẾM NGƯỢC ================= */
 .countdown {
-  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-warm) 100%);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-blush) 100%);
 }
 
 .countdown__grid {
@@ -199,10 +199,10 @@
 }
 
 .cd__lbl {
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 
 .countdown__done {
@@ -338,7 +338,7 @@
 
 /* ================= THIỆP ================= */
 .invite {
-  background: linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 45%);
+  background: linear-gradient(180deg, var(--paper-blush) 0%, var(--paper) 52%);
   perspective: 1600px;
 }
 
@@ -520,7 +520,7 @@
 
 /* ================= CHƯƠNG TRÌNH ================= */
 .events {
-  background: var(--paper-warm);
+  background: var(--paper-sage);
 }
 
 .timeline {
@@ -587,8 +587,8 @@
 }
 
 .tl__addr {
-  color: var(--ink-3);
-  font-size: 0.9rem;
+  color: var(--ink-2);
+  font-size: 0.92rem;
 }
 
 .tl__map {
@@ -705,7 +705,7 @@
 
 /* ================= RSVP ================= */
 .rsvp {
-  background: var(--paper-warm);
+  background: var(--paper-blush);
 }
 
 .rsvp__note {

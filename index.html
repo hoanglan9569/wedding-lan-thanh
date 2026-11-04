@@ -45,25 +45,39 @@
     />
   </head>
   <body>
-    <!-- ================= MÀN MỞ THIỆP ================= -->
+    <!-- ================= MÀN MỞ THIỆP (phong bì) ================= -->
     <div class="intro" id="intro" aria-hidden="false">
-      <div class="intro__paper">
-        <div class="intro__ornament" aria-hidden="true">
-          <svg viewBox="0 0 120 60" class="lotus-line">
-            <use href="#lotus-mark" />
-          </svg>
+      <div class="intro__stage">
+        <div class="env" id="env">
+          <!-- tấm thiệp nằm trong phong bì, trượt lên khi mở -->
+          <article class="env__card" id="env-card">
+            <div class="env__card-in">
+              <img class="env__wreath" src="/art/wreath.webp" alt="" aria-hidden="true" />
+              <p class="env__eyebrow">Save the date</p>
+              <h1 class="env__names">Hoàng Lân <em>&amp;</em> Kim Thanh</h1>
+              <p class="env__date">29 . 11 . 2026</p>
+            </div>
+          </article>
+
+          <div class="env__pocket" aria-hidden="true"></div>
+
+          <div class="env__front">
+            <p class="env__to">Trân trọng kính mời</p>
+            <p class="env__guest" id="intro-guest">Quý khách</p>
+          </div>
+
+          <div class="env__flap" id="env-flap" aria-hidden="true"></div>
+
+          <button class="seal" id="intro-open" type="button" aria-label="Mở thiệp">
+            <img class="seal__art" src="/art/seal.webp" alt="" aria-hidden="true" />
+            <span class="seal__fallback" aria-hidden="true">L&amp;T</span>
+          </button>
         </div>
-        <p class="intro__eyebrow">Trân trọng kính mời</p>
-        <p class="intro__guest" id="intro-guest">Quý khách</p>
-        <div class="intro__rule" aria-hidden="true"><span></span></div>
-        <h1 class="intro__names">
-          <span>Hoàng Lân</span><em>&amp;</em><span>Kim Thanh</span>
-        </h1>
-        <p class="intro__date">29 . 11 . 2026</p>
-        <button class="btn btn--seal" id="intro-open" type="button">
-          <span class="btn__label">Mở thiệp</span>
-        </button>
-        <p class="intro__hint">Thiệp có nhạc nền · bạn có thể tắt bất cứ lúc nào</p>
+
+        <p class="intro__hint" id="intro-hint">
+          <span>Chạm vào dấu niêm phong</span>
+          <span class="intro__hint-or">hoặc cuộn xuống để mở thiệp</span>
+        </p>
       </div>
     </div>
 
@@ -283,11 +297,6 @@
           </div>
         </div>
 
-        <div class="shell center">
-          <div class="btnrow" data-reveal="fade">
-            <button class="btn btn--line btn--sm" id="view-original" type="button">Xem thiệp giấy</button>
-          </div>
-        </div>
       </section>
 
       <!-- ================= CHƯƠNG TRÌNH ================= -->

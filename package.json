@@ -10,6 +10,7 @@
     "preview": "vite preview --port 4173",
     "typecheck": "tsc --noEmit",
     "optimize": "bun scripts/optimize-images.ts",
+    "optimize:art": "bun scripts/optimize-art.ts",
     "shots": "bun scripts/shots.ts",
     "deploy": "bun run build && bunx wrangler pages deploy dist --project-name lanthanh --commit-dirty=true",
     "rsvp:list": "cd worker && bunx wrangler kv key list --binding RSVP",

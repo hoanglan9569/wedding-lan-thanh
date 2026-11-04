@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Quản lý Sổ lưu bút · Lân &amp; Thanh</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --paper: #fcfaf7;
+        --paper-card: #ffffff;
+        --ink: #2b2724;
+        --ink-2: #5e554c;
+        --ink-3: #978d82;
+        --green: #33503c;
+        --green-soft: #eaf1eb;
+        --blush: #e3a9b2;
+        --blush-soft: #f7e4e6;
+        --line: rgba(43, 39, 36, 0.12);
+        --line-soft: rgba(43, 39, 36, 0.06);
+        --shadow: 0 4px 18px rgba(58, 45, 32, 0.06);
+        --serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+        --sans: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.6;
+        padding: 2rem 1rem 4rem;
+      }
+      .container {
+        width: min(100%, 820px);
+        margin: 0 auto;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px solid var(--line);
+      }
+      h1 {
+        font-family: var(--serif);
+        font-size: 1.9rem;
+        font-weight: 600;
+        color: var(--green);
+        letter-spacing: 0.02em;
+      }
+      .subtitle {
+        color: var(--ink-3);
+        font-size: 0.9rem;
+        margin-top: 0.2rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.55rem 1.15rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+      }
+      .btn-primary { background: var(--green); color: #fff; }
+      .btn-primary:hover { opacity: 0.9; }
+      .btn-outline { background: transparent; border-color: var(--line); color: var(--ink); }
+      .btn-outline:hover { background: #f0ebe4; }
+      .btn-approve { background: var(--green); color: #fff; }
+      .btn-approve:hover { opacity: 0.9; }
+      .btn-hide { background: #8e8275; color: #fff; }
+      .btn-hide:hover { opacity: 0.9; }
+      .btn-edit { background: #b89858; color: #fff; }
+      .btn-edit:hover { opacity: 0.9; }
+      .btn-delete { background: transparent; border-color: #d9777f; color: #c44751; }
+      .btn-delete:hover { background: var(--blush-soft); }
+      .btn-sm { padding: 0.38rem 0.8rem; font-size: 0.72rem; }
+
+      .card {
+        background: var(--paper-card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        padding: 1.6rem;
+        margin-bottom: 1.5rem;
+      }
+      .form-row { margin-bottom: 1rem; }
+      label {
+        display: block;
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 0.4rem;
+      }
+      input[type="password"], input[type="text"], textarea {
+        width: 100%;
+        padding: 0.75rem 0.9rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--ink);
+      }
+      input:focus, textarea:focus {
+        outline: none;
+        border-color: var(--green);
+      }
+      .msg {
+        font-size: 0.85rem;
+        margin-top: 0.8rem;
+      }
+      .msg-err { color: #c44751; }
+      .msg-ok { color: var(--green); }
+
+      /* Summary stats */
+      .stats-bar {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+      .stat-pill {
+        padding: 0.5rem 1rem;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        color: var(--ink-2);
+      }
+      .stat-pill strong { color: var(--green); }
+
+      /* Group sections */
+      .group-title {
+        font-family: var(--serif);
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin: 2rem 0 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .badge-count {
+        font-size: 0.74rem;
+        font-family: var(--sans);
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        background: var(--green-soft);
+        color: var(--green);
+        font-weight: 600;
+      }
+      .empty-group {
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--ink-3);
+        background: #fff;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Record card */
+      .wish-card {
+        background: var(--paper-card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        padding: 1.3rem 1.4rem;
+        margin-bottom: 1rem;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 0.8rem;
+      }
+      .who-block { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+      .who-name { font-weight: 600; font-size: 1.05rem; color: var(--ink); }
+      .tag {
+        font-size: 0.72rem;
+        padding: 0.15rem 0.55rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
+      }
+      .tag-side { background: #f0ebe4; color: var(--ink-2); }
+      .tag-attend-yes { background: var(--green-soft); color: var(--green); }
+      .tag-attend-no { background: var(--blush-soft); color: #c44751; }
+      .card-time { font-size: 0.78rem; color: var(--ink-3); }
+
+      .wish-box { margin-bottom: 1rem; }
+      .wish-box textarea {
+        min-height: 80px;
+        font-family: var(--serif);
+        font-size: 1.05rem;
+        line-height: 1.5;
+        font-style: italic;
+        resize: vertical;
+      }
+      .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .card-status-note {
+        margin-left: auto;
+        font-size: 0.78rem;
+        color: var(--ink-3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div>
+          <h1>Sổ Lưu Bút · Quản Trị</h1>
+          <p class="subtitle">Duyệt, chỉnh sửa và quản lý lời chúc từ khách mời</p>
+        </div>
+        <div id="authActions" style="display: none;">
+          <button id="logoutBtn" class="btn btn-outline btn-sm" type="button">Đăng xuất</button>
+        </div>
+      </header>
+
+      <!-- SETUP CARD -->
+      <section id="setupView" class="card" style="display: none;">
+        <h2 style="font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.8rem; color: var(--green);">
+          Đặt mật khẩu lần đầu
+        </h2>
+        <p style="color: var(--ink-2); font-size: 0.9rem; margin-bottom: 1.4rem;">
+          Chưa có mật khẩu quản trị. Vui lòng thiết lập mật khẩu (ít nhất 8 ký tự).
+        </p>
+        <form id="setupForm">
+          <div class="form-row">
+            <label for="setupPass">Mật khẩu mới</label>
+            <input id="setupPass" type="password" minlength="8" required />
+          </div>
+          <div class="form-row">
+            <label for="setupPassConfirm">Nhập lại mật khẩu</label>
+            <input id="setupPassConfirm" type="password" minlength="8" required />
+          </div>
+          <button class="btn btn-primary" type="submit">Lưu mật khẩu</button>
+          <p id="setupMsg" class="msg"></p>
+        </form>
+      </section>
+
+      <!-- LOGIN CARD -->
+      <section id="loginView" class="card" style="display: none;">
+        <h2 style="font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.8rem; color: var(--green);">
+          Đăng nhập quản trị
+        </h2>
+        <form id="loginForm">
+          <div class="form-row">
+            <label for="loginPass">Mật khẩu</label>
+            <input id="loginPass" type="password" required />
+          </div>
+          <button class="btn btn-primary" type="submit">Đăng nhập</button>
+          <p id="loginMsg" class="msg"></p>
+        </form>
+      </section>
+
+      <!-- MAIN APP VIEW -->
+      <main id="appView" style="display: none;">
+        <div class="stats-bar">
+          <div class="stat-pill">Chờ duyệt: <strong id="countPending">0</strong></div>
+          <div class="stat-pill">Đã duyệt: <strong id="countApproved">0</strong></div>
+          <div class="stat-pill">Đã ẩn: <strong id="countHidden">0</strong></div>
+          <button id="refreshBtn" class="btn btn-outline btn-sm" style="margin-left: auto;" type="button">
+            Làm mới
+          </button>
+        </div>
+
+        <section>
+          <h2 class="group-title">
+            Chờ duyệt <span class="badge-count" id="badgePending">0</span>
+          </h2>
+          <div id="listPending"></div>
+        </section>
+
+        <section>
+          <h2 class="group-title">
+            Đã duyệt <span class="badge-count" id="badgeApproved">0</span>
+          </h2>
+          <div id="listApproved"></div>
+        </section>
+
+        <section>
+          <h2 class="group-title">
+            Đã ẩn <span class="badge-count" id="badgeHidden">0</span>
+          </h2>
+          <div id="listHidden"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const API_HOST = 'https://lanthanh-rsvp.hoanglan9569.workers.dev';
+      const STORAGE_KEY = 'lanthanh:admin';
+
+      let currentToken = localStorage.getItem(STORAGE_KEY) || '';
+
+      function formatDate(isoStr) {
+        if (!isoStr) return '';
+        try {
+          const d = new Date(isoStr);
+          const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Ho_Chi_Minh',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          }).formatToParts(d);
+          const m = {};
+          parts.forEach(p => m[p.type] = p.value);
+          return `${m.day}/${m.month}/${m.year} ${m.hour}:${m.minute}`;
+        } catch {
+          return isoStr;
+        }
+      }
+
+      function showView(viewId) {
+        document.getElementById('setupView').style.display = viewId === 'setup' ? 'block' : 'none';
+        document.getElementById('loginView').style.display = viewId === 'login' ? 'block' : 'none';
+        document.getElementById('appView').style.display = viewId === 'app' ? 'block' : 'none';
+        document.getElementById('authActions').style.display = viewId === 'app' ? 'block' : 'none';
+      }
+
+      async function checkState() {
+        try {
+          const res = await fetch(`${API_HOST}/admin/state`);
+          const data = await res.json();
+          if (!data.hasPassword) {
+            showView('setup');
+            return;
+          }
+          if (currentToken) {
+            await fetchAndRenderList();
+          } else {
+            showView('login');
+          }
+        } catch (err) {
+          showView('login');
+          const msg = document.getElementById('loginMsg');
+          msg.textContent = 'Không thể kết nối đến máy chủ: ' + err.message;
+          msg.className = 'msg msg-err';
+        }
+      }
+
+      async function fetchAndRenderList() {
+        try {
+          const res = await fetch(`${API_HOST}/admin/list`, {
+            headers: { 'x-admin-token': currentToken }
+          });
+          if (res.status === 401) {
+            localStorage.removeItem(STORAGE_KEY);
+            currentToken = '';
+            showView('login');
+            const msg = document.getElementById('loginMsg');
+            msg.textContent = 'Mật khẩu không chính xác hoặc phiên đã hết hạn.';
+            msg.className = 'msg msg-err';
+            return;
+          }
+          if (!res.ok) {
+            throw new Error(`Lỗi ${res.status}`);
+          }
+          const list = await res.json();
+          renderRecords(list);
+          showView('app');
+        } catch (err) {
+          alert('Không thể tải danh sách: ' + err.message);
+        }
+      }
+
+      function renderRecords(records) {
+        const pending = [];
+        const approved = [];
+        const hidden = [];
+
+        records.forEach(r => {
+          const st = r.status || 'pending';
+          if (st === 'approved') approved.push(r);
+          else if (st === 'hidden') hidden.push(r);
+          else pending.push(r);
+        });
+
+        document.getElementById('countPending').textContent = pending.length;
+        document.getElementById('badgePending').textContent = pending.length;
+        document.getElementById('countApproved').textContent = approved.length;
+        document.getElementById('badgeApproved').textContent = approved.length;
+        document.getElementById('countHidden').textContent = hidden.length;
+        document.getElementById('badgeHidden').textContent = hidden.length;
+
+        renderGroup('listPending', pending, 'Không có lời chúc nào đang chờ duyệt.');
+        renderGroup('listApproved', approved, 'Chưa có lời chúc nào được duyệt.');
+        renderGroup('listHidden', hidden, 'Không có lời chúc nào bị ẩn.');
+      }
+
+      function renderGroup(containerId, list, emptyText) {
+        const container = document.getElementById(containerId);
+        container.replaceChildren();
+        if (list.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'empty-group';
+          empty.textContent = emptyText;
+          container.appendChild(empty);
+          return;
+        }
+
+        list.forEach(r => {
+          container.appendChild(createCard(r));
+        });
+      }
+
+      function createCard(r) {
+        const card = document.createElement('article');
+        card.className = 'wish-card';
+        card.id = `card-${r.id}`;
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+
+        const who = document.createElement('div');
+        who.className = 'who-block';
+
+        const name = document.createElement('span');
+        name.className = 'who-name';
+        name.textContent = r.name || '(Chưa có tên)';
+
+        const side = document.createElement('span');
+        side.className = 'tag tag-side';
+        side.textContent = r.side || 'Nhà trai';
+
+        const attend = document.createElement('span');
+        attend.className = `tag ${r.attend === 'Có' ? 'tag-attend-yes' : 'tag-attend-no'}`;
+        attend.textContent = r.attend === 'Có' ? `Tham dự · ${r.guests || 1} khách` : 'Không tham dự';
+
+        who.append(name, side, attend);
+
+        const time = document.createElement('span');
+        time.className = 'card-time';
+        time.textContent = formatDate(r.at);
+
+        header.append(who, time);
+
+        const wishBox = document.createElement('div');
+        wishBox.className = 'wish-box';
+        const textarea = document.createElement('textarea');
+        textarea.value = r.wish || '';
+        textarea.placeholder = '(Không để lại lời chúc)';
+        wishBox.appendChild(textarea);
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const statusNote = document.createElement('span');
+        statusNote.className = 'card-status-note';
+
+        const btnApprove = document.createElement('button');
+        btnApprove.className = 'btn btn-approve btn-sm';
+        btnApprove.type = 'button';
+        btnApprove.textContent = 'Duyệt';
+        btnApprove.addEventListener('click', () => updateRecord(r.id, { status: 'approved' }, statusNote));
+
+        const btnHide = document.createElement('button');
+        btnHide.className = 'btn btn-hide btn-sm';
+        btnHide.type = 'button';
+        btnHide.textContent = 'Ẩn';
+        btnHide.addEventListener('click', () => updateRecord(r.id, { status: 'hidden' }, statusNote));
+
+        const btnSave = document.createElement('button');
+        btnSave.className = 'btn btn-edit btn-sm';
+        btnSave.type = 'button';
+        btnSave.textContent = 'Lưu sửa';
+        btnSave.addEventListener('click', () => updateRecord(r.id, { wish: textarea.value }, statusNote));
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-delete btn-sm';
+        btnDelete.type = 'button';
+        btnDelete.textContent = 'Xoá';
+        btnDelete.addEventListener('click', () => deleteRecord(r.id, statusNote));
+
+        actions.append(btnApprove, btnHide, btnSave, btnDelete, statusNote);
+        card.append(header, wishBox, actions);
+        return card;
+      }
+
+      async function updateRecord(id, patch, noteEl) {
+        if (noteEl) noteEl.textContent = 'Đang lưu...';
+        try {
+          const res = await fetch(`${API_HOST}/admin/update`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-token': currentToken
+            },
+            body: JSON.stringify({ id, ...patch })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || 'Cập nhật thất bại');
+          }
+          if (noteEl) noteEl.textContent = 'Đã lưu!';
+          await fetchAndRenderList();
+        } catch (err) {
+          if (noteEl) noteEl.textContent = 'Lỗi: ' + err.message;
+          alert('Lỗi: ' + err.message);
+        }
+      }
+
+      async function deleteRecord(id, noteEl) {
+        if (!confirm('Bạn có chắc chắn muốn xoá phản hồi này không?')) return;
+        if (noteEl) noteEl.textContent = 'Đang xoá...';
+        try {
+          const res = await fetch(`${API_HOST}/admin/delete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-token': currentToken
+            },
+            body: JSON.stringify({ id })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || 'Xoá thất bại');
+          }
+          await fetchAndRenderList();
+        } catch (err) {
+          if (noteEl) noteEl.textContent = 'Lỗi: ' + err.message;
+          alert('Lỗi: ' + err.message);
+        }
+      }
+
+      // Event Listeners
+      document.getElementById('setupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const p1 = document.getElementById('setupPass').value;
+        const p2 = document.getElementById('setupPassConfirm').value;
+        const msg = document.getElementById('setupMsg');
+
+        if (p1 !== p2) {
+          msg.textContent = 'Mật khẩu xác nhận không khớp.';
+          msg.className = 'msg msg-err';
+          return;
+        }
+        if (p1.length < 8) {
+          msg.textContent = 'Mật khẩu phải từ 8 ký tự trở lên.';
+          msg.className = 'msg msg-err';
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_HOST}/admin/setup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: p1 })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || 'Thiết lập mật khẩu thất bại');
+          }
+          currentToken = p1;
+          localStorage.setItem(STORAGE_KEY, currentToken);
+          await fetchAndRenderList();
+        } catch (err) {
+          msg.textContent = err.message;
+          msg.className = 'msg msg-err';
+        }
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pass = document.getElementById('loginPass').value;
+        const msg = document.getElementById('loginMsg');
+        currentToken = pass;
+
+        try {
+          const res = await fetch(`${API_HOST}/admin/list`, {
+            headers: { 'x-admin-token': currentToken }
+          });
+          if (res.status === 401) {
+            currentToken = '';
+            msg.textContent = 'Sai mật khẩu.';
+            msg.className = 'msg msg-err';
+            return;
+          }
+          if (res.status === 429) {
+            currentToken = '';
+            msg.textContent = 'Thử sai quá nhiều lần. Vui lòng chờ 10 phút.';
+            msg.className = 'msg msg-err';
+            return;
+          }
+          if (!res.ok) {
+            throw new Error(`Lỗi ${res.status}`);
+          }
+          localStorage.setItem(STORAGE_KEY, currentToken);
+          const list = await res.json();
+          renderRecords(list);
+          showView('app');
+        } catch (err) {
+          currentToken = '';
+          msg.textContent = err.message;
+          msg.className = 'msg msg-err';
+        }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        currentToken = '';
+        localStorage.removeItem(STORAGE_KEY);
+        showView('login');
+      });
+
+      document.getElementById('refreshBtn').addEventListener('click', () => {
+        fetchAndRenderList();
+      });
+
+      checkState();
+    </script>
+  </body>
+</html>
