@@ -1,6 +1,7 @@
 /* ================================================================
    Điểm nhấn hình ảnh: tranh màu nước do Krea 2 vẽ, đặt bằng nền CSS
    nên thiếu tệp nào thì chỗ đó chỉ đơn giản là trống, không vỡ bố cục.
+   Chỉ tải sau khi khách mở thiệp (html.is-open) để lần đầu vào trang nhẹ.
    ================================================================ */
 
 .countdown,
@@ -15,7 +16,7 @@
 }
 
 /* Cánh hoa rơi nối ảnh cưới xuống phần đếm ngược */
-.countdown::before {
+.is-open .countdown::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
@@ -28,7 +29,7 @@
 }
 
 /* Nhành sen góc dưới bên trái của lời ngỏ */
-.letter::before {
+.is-open .letter::before {
   content: '';
   position: absolute;
   left: -3%;
@@ -41,7 +42,7 @@
 }
 
 /* Nhành sen lật ngược ở góc trên bên phải phần cô dâu chú rể */
-.pair::before {
+.is-open .pair::before {
   content: '';
   position: absolute;
   right: -4%;
@@ -49,7 +50,7 @@
   width: min(38vw, 340px);
   aspect-ratio: 1;
   background: url('/art/corner-spray.webp') no-repeat right top / contain;
-  opacity: 0.32;
+  opacity: 0.3;
   transform: scaleX(-1) rotate(180deg);
   pointer-events: none;
 }
@@ -59,7 +60,7 @@
   position: relative;
 }
 
-.pair__amp::before {
+.is-open .pair__amp::before {
   content: '';
   position: absolute;
   inset: -135% -75%;
@@ -69,7 +70,7 @@
 }
 
 /* Vòng hoa mờ trên đầu tấm thiệp */
-.card3d__inner::before {
+.is-open .card3d__inner::before {
   content: '';
   position: absolute;
   top: -3%;
@@ -78,14 +79,15 @@
   width: 66%;
   aspect-ratio: 1;
   background: url('/art/wreath.webp') no-repeat center top / contain;
-  opacity: 0.26;
+  opacity: 0.24;
   pointer-events: none;
 }
 
 /* Đường hoa ngăn mục */
-.events::before,
-.venue::before,
-.rsvp::before {
+.is-open .events::before,
+.is-open .venue::before,
+.is-open .rsvp::before,
+.is-open .wishes::before {
   content: '';
   position: absolute;
   top: clamp(1.5rem, 4vw, 3.2rem);
@@ -100,12 +102,13 @@
 
 .events,
 .venue,
-.rsvp {
+.rsvp,
+.wishes {
   padding-top: calc(var(--section-y) + clamp(2.2rem, 5vw, 4rem));
 }
 
 /* Cánh hoa phủ nhẹ trên chân trang xanh */
-.footer::before {
+.is-open .footer::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
@@ -122,14 +125,13 @@
   z-index: 1;
 }
 
-/* Màn mở thiệp: vòng hoa in chìm sau tên hai người */
 .env__wreath {
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .countdown::before,
-  .footer::before {
+  .is-open .countdown::before,
+  .is-open .footer::before {
     animation: driftY 26s ease-in-out infinite alternate;
   }
 }

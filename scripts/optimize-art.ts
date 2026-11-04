@@ -11,6 +11,8 @@ interface ArtTarget {
   name: string;
   width: number;
   quality: number;
+  /** tên tệp nguồn nếu khác tên đích (bản nhỏ dùng chung một bản vẽ) */
+  source?: string;
 }
 
 const TARGETS: ArtTarget[] = [
@@ -18,6 +20,7 @@ const TARGETS: ArtTarget[] = [
   { name: 'corner-spray', width: 760, quality: 70 },
   { name: 'divider', width: 900, quality: 74 },
   { name: 'wreath', width: 760, quality: 70 },
+  { name: 'wreath-sm', width: 420, quality: 72, source: 'wreath' },
   { name: 'seal', width: 256, quality: 86 },
   { name: 'petal-fall', width: 1200, quality: 56 },
 ];
@@ -26,7 +29,7 @@ const SRC = path.join('assets-src', 'art');
 const OUT = path.join('public', 'art');
 
 async function shrink(target: ArtTarget): Promise<string> {
-  const input = path.join(SRC, `${target.name}.webp`);
+  const input = path.join(SRC, `${target.source ?? target.name}.webp`);
   const output = path.join(OUT, `${target.name}.webp`);
   const image = sharp(input).resize({ width: target.width, withoutEnlargement: true });
   const buffer = await image.webp({ quality: target.quality, alphaQuality: 90, effort: 6 }).toBuffer();

@@ -1,19 +1,16 @@
 /* ---------- Fonts (self-hosted, kèm bộ ký tự tiếng Việt) ---------- */
 @import '@fontsource/cormorant-garamond/latin-400.css';
 @import '@fontsource/cormorant-garamond/latin-500.css';
-@import '@fontsource/cormorant-garamond/latin-600.css';
 @import '@fontsource/cormorant-garamond/latin-400-italic.css';
 @import '@fontsource/cormorant-garamond/vietnamese-400.css';
 @import '@fontsource/cormorant-garamond/vietnamese-500.css';
-@import '@fontsource/cormorant-garamond/vietnamese-600.css';
 @import '@fontsource/cormorant-garamond/vietnamese-400-italic.css';
-@import '@fontsource/be-vietnam-pro/latin-300.css';
 @import '@fontsource/be-vietnam-pro/latin-400.css';
 @import '@fontsource/be-vietnam-pro/latin-500.css';
-@import '@fontsource/be-vietnam-pro/vietnamese-300.css';
 @import '@fontsource/be-vietnam-pro/vietnamese-400.css';
 @import '@fontsource/be-vietnam-pro/vietnamese-500.css';
-@import '@fontsource/dancing-script/400.css';
+@import '@fontsource/dancing-script/latin-400.css';
+@import '@fontsource/dancing-script/vietnamese-400.css';
 
 /* ---------- Tokens: một theme sáng, nền ngà ấm và hồng phấn nhạt ----------
    Nền không bao giờ trắng tinh, chữ không bao giờ đen tuyền: tương phản đủ đọc
@@ -180,8 +177,22 @@ section[id] {
   font-weight: 500;
   letter-spacing: 0.36em;
   text-transform: uppercase;
-  color: var(--green-2);
+  color: var(--green);
   margin-bottom: 0.9rem;
+}
+
+/* Số của ngày giờ luôn dùng phông chữ không chân: chữ số 1 của phông có chân
+   trông y hệt chữ I hoa, người đọc nhầm "29 . 11" thành "29 . II". */
+.cd__num,
+.tl__time,
+.env__date,
+.footer__date,
+.hero__dateline strong,
+.card__hour,
+.card__day,
+.card__lunar {
+  font-family: var(--sans);
+  font-feature-settings: 'lnum' 1, 'tnum' 1;
 }
 
 /* hai nét kẻ hồng hai bên nhãn mục */

@@ -85,6 +85,7 @@ Khách gửi phản hồi thì bản ghi vào Cloudflare Worker `lanthanh-rsvp`
 - Lần đầu vào sẽ hỏi đặt mật khẩu (ít nhất 8 ký tự). Worker chỉ lưu bản băm SHA-256 kèm muối,
   không lưu mật khẩu gốc, và khoá IP 10 phút sau 10 lần nhập sai.
 - Mỗi lời chúc có nút **Duyệt**, **Ẩn**, **Lưu sửa** (sửa chữ trong ô văn bản) và **Xoá**.
+- Lời chúc vừa duyệt xuất hiện trên trang sau tối đa 30 giây (bộ nhớ đệm của Cloudflare).
 - Quên mật khẩu: xoá khoá `admin:auth` rồi đặt lại
   (`cd worker && bunx wrangler kv key delete "admin:auth" --binding RSVP --remote`).
 

@@ -110,28 +110,30 @@
   position: relative;
   width: min(86vw, 450px);
   aspect-ratio: 3 / 2;
+  /* không dùng filter ở đây: filter ép phẳng không gian 3D nên nắp không lật được */
   transform-style: preserve-3d;
-  filter: drop-shadow(0 24px 44px rgba(132, 94, 86, 0.2));
 }
 
-/* thân phong bì */
+/* thân phong bì (đồng thời che kín tấm thiệp khi chưa mở) */
 .env::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 0;
   border-radius: 7px;
   background: linear-gradient(158deg, #fdf9f6 0%, #f8ece8 100%);
   border: 1px solid rgba(58, 51, 46, 0.09);
+  box-shadow: 0 24px 44px rgba(132, 94, 86, 0.2);
 }
 
-/* tấm thiệp giấu bên trong */
+/* tấm thiệp nằm sau thân phong bì, lúc mở mới được nâng lên trên */
 .env__card {
   position: absolute;
   left: 5%;
   top: 6%;
   width: 90%;
   height: 86%;
-  z-index: 2;
+  z-index: -1;
   border-radius: 4px;
   background: var(--paper);
   border: 1px solid var(--line-soft);
@@ -235,7 +237,7 @@
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background: linear-gradient(176deg, #f9eee9 0%, #f2e0db 100%);
   border-top: 1px solid rgba(58, 51, 46, 0.08);
-  backface-visibility: hidden;
+  box-shadow: 0 6px 14px rgba(132, 94, 86, 0.12);
 }
 
 /* dấu niêm phong = nút mở */
@@ -481,7 +483,7 @@
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 2px;
-  font-weight: 300;
+  font-weight: 400;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
