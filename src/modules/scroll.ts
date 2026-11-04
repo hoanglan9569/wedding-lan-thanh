@@ -24,6 +24,8 @@ export function initSmoothScroll(): void {
     touchMultiplier: 1.6,
     autoRaf: false,
   });
+  // tay cầm để công cụ kiểm tra tắt cuộn mượt trước khi chụp ảnh ghép
+  (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis?.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);

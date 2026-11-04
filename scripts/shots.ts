@@ -34,6 +34,15 @@ interface Report {
 async function measure(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const out: string[] = [];
+    const paper = document.querySelector('.intro__paper');
+    if (paper) {
+      const box = paper.getBoundingClientRect();
+      out.push(
+        `thiệp mở màn: ${Math.round(box.width)}x${Math.round(box.height)} trong ${
+          window.innerWidth
+        }x${window.innerHeight}, tràn dọc ${Math.max(0, Math.round(box.bottom - window.innerHeight))}px`,
+      );
+    }
     const btn = document.querySelector('#intro-open');
     if (!btn) out.push('intro-open: MISSING');
     else {
@@ -131,6 +140,9 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   await warmUp(page);
   const hidden = await stillHidden(page);
   checks.push(`còn mờ sau khi cuộn: ${hidden.length ? hidden.join(' | ') : 'không có'}`);
+  // Tắt cuộn mượt: nó giành quyền cuộn với trình chụp nên ảnh ghép bị lệch.
+  await page.evaluate(() => (window as unknown as { __lenis?: { destroy(): void } }).__lenis?.destroy());
+  await page.waitForTimeout(300);
   const shots = await shootSections(page, view);
 
   const overflow = await page.evaluate(
