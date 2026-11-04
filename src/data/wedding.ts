@@ -86,9 +86,9 @@ export const venue = {
 } as const;
 
 export const album: PhotoDef[] = [
-  { slug: 'van06795', alt: 'Hoàng Lân và Kim Thanh trong vườn', caption: 'Nắm tay nhau' },
-  { slug: 'van06896', alt: 'Cô dâu chú rể sau bó hoa cưới', caption: 'Lời thì thầm' },
   { slug: 'van06601', alt: 'Cô dâu Kim Thanh', caption: 'Cô dâu' },
+  { slug: 'van06896', alt: 'Cô dâu chú rể sau bó hoa cưới', caption: 'Lời thì thầm' },
+  { slug: 'van06795', alt: 'Hoàng Lân và Kim Thanh trong vườn', caption: 'Nắm tay nhau' },
   { slug: 'van09249', alt: 'Chú rể Hoàng Lân', caption: 'Chú rể' },
 ];
 

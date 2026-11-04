@@ -69,11 +69,11 @@
 
 .env__wreath {
   position: absolute;
-  top: -6%;
+  top: 3%;
   left: 50%;
-  width: 72%;
+  width: 56%;
   translate: -50% 0;
-  opacity: 0.5;
+  opacity: 0.42;
   z-index: -1;
 }
 

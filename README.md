@@ -53,12 +53,10 @@ Nhận cả `?guest=`, `?khach=`, `?name=`.
 Ảnh gốc (4600x6900, ~65 MB) không nằm trong git. Tải lại từ Google Drive rồi đặt vào
 `assets-src/originals/` với đúng tên:
 
-| Tệp | Google Drive file id |
-| --- | --- |
-| VAN06601.jpg | `1zJK2RQD_LVWN7YkjzNsKBjnmclOmj-Z6` |
-| VAN06795.jpg | `1sqSGUPb_AqRHXzzAE2EaE2fl5OUdi2kT` |
-| VAN06896.jpg | `1KokRSp56JL15_25SDHNBQ1tYrsJNZvH9` |
-| VAN09249.jpg | `1tUq4BFBNZXA2rh2pK7JMf5z5wN8ef6py` |
+`VAN06601.jpg`, `VAN06795.jpg`, `VAN06896.jpg`, `VAN09249.jpg`.
+
+Kho này để công khai nên id của từng tệp Drive không nằm trong git: xem
+`assets-src/originals/DRIVE-IDS.md` trên máy chủ sở hữu (thư mục đã bị git bỏ qua).
 
 Sinh lại ảnh web (webp nhiều kích thước + ảnh mờ LQIP):
 

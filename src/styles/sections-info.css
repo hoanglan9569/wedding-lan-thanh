@@ -317,10 +317,10 @@
 }
 
 .footer__mark {
-  width: 96px;
-  height: 48px;
+  width: 128px;
+  height: 64px;
   margin: 0 auto 1.4rem;
-  color: var(--sage);
+  opacity: 0.9;
 }
 
 .footer__names {

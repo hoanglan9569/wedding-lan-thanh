@@ -84,6 +84,8 @@
 
 .card3d__inner {
   position: relative;
+  /* chặn mọi hoạ tiết nền tràn ra ngoài mép thiệp */
+  overflow: hidden;
   padding: clamp(2.2rem, 7vw, 3.8rem) clamp(1.4rem, 6vw, 3.2rem);
   text-align: center;
   background: var(--paper);
@@ -200,10 +202,9 @@
 }
 
 .card__divider {
-  width: 92px;
-  height: 46px;
+  width: 124px;
+  height: 62px;
   margin: 1.8rem auto;
-  color: var(--sage);
 }
 
 .card__invite {

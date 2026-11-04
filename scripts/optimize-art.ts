@@ -15,6 +15,9 @@ interface ArtTarget {
   source?: string;
 }
 
+// Không thêm lotus-sprig / lotus-sprig-light / favicon*.png vào đây: chúng được cắt viền,
+// căn giữa theo tỉ lệ 2:1 và tô lại màu bằng out/auto-warband-art/tools/wedding-logo-export.py,
+// chạy lại qua đây sẽ ghi đè bản đã căn chỉnh.
 const TARGETS: ArtTarget[] = [
   // Tranh nằm dưới chữ với độ mờ 0.14-0.55 nên nén mạnh vẫn không thấy khác.
   { name: 'corner-spray', width: 760, quality: 70 },
