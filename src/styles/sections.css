@@ -1,0 +1,827 @@
+/* ================= HERO ================= */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__media {
+  position: absolute;
+  inset: -8% 0 -8% 0;
+  z-index: -2;
+  will-change: transform;
+}
+
+.hero__media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  transform: scale(1.06);
+}
+
+.hero__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(252, 250, 247, 0.55) 0%,
+      rgba(252, 250, 247, 0.12) 28%,
+      rgba(43, 39, 36, 0.28) 72%,
+      rgba(43, 39, 36, 0.52) 100%
+    );
+}
+
+.petals {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.hero__inner {
+  position: relative;
+  padding: 7rem var(--gap) 8rem;
+  text-align: center;
+  color: var(--paper);
+  text-shadow: 0 2px 26px rgba(32, 26, 20, 0.35);
+}
+
+.hero__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.52em;
+  text-transform: uppercase;
+  margin-bottom: clamp(1rem, 3vw, 1.8rem);
+  opacity: 0.92;
+}
+
+.hero__names {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.9rem, 1.4rem + 10vw, 7.4rem);
+  line-height: 0.98;
+  letter-spacing: 0.015em;
+  display: grid;
+  gap: 0.1em;
+}
+
+.hero__amp {
+  font-family: var(--script);
+  font-size: 0.42em;
+  color: var(--blush-soft);
+  display: block;
+}
+
+.hero__dateline {
+  margin-top: clamp(1.4rem, 4vw, 2.4rem);
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.hero__dateline strong {
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: none;
+}
+
+.hero__dateline span:last-child {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: none;
+  opacity: 0.86;
+}
+
+.scrollcue {
+  position: absolute;
+  bottom: calc(1.4rem + env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  color: var(--paper);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.scrollcue i {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(180deg, rgba(252, 250, 247, 0.9), rgba(252, 250, 247, 0));
+  animation: cue 2.2s var(--ease-soft) infinite;
+  transform-origin: top;
+}
+
+/* Điện thoại: đẩy chữ xuống dưới để không che mặt cô dâu chú rể */
+@media (max-width: 760px) {
+  .hero {
+    align-content: end;
+  }
+
+  .hero__inner {
+    padding: 5rem var(--gap) 7.5rem;
+  }
+
+  .hero__media img {
+    object-position: 50% 24%;
+  }
+
+  .hero__veil {
+    background: linear-gradient(
+      180deg,
+      rgba(252, 250, 247, 0.42) 0%,
+      rgba(43, 39, 36, 0.08) 22%,
+      rgba(43, 39, 36, 0.42) 58%,
+      rgba(43, 39, 36, 0.68) 100%
+    );
+  }
+}
+
+@keyframes cue {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+/* ================= ĐẾM NGƯỢC ================= */
+.countdown {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-warm) 100%);
+}
+
+.countdown__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.4rem, 2vw, 1.4rem);
+  margin-top: 0.6rem;
+}
+
+.cd {
+  position: relative;
+  display: grid;
+  gap: 0.3rem;
+  padding: clamp(0.9rem, 3vw, 1.6rem) 0.3rem;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+.cd__num {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 1rem + 4.4vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+.cd__lbl {
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.countdown__done {
+  margin-top: 1.4rem;
+  font-family: var(--script);
+  font-size: 1.8rem;
+  color: var(--blush);
+}
+
+/* ================= LỜI NGỎ ================= */
+.letter {
+  background: var(--paper-warm);
+}
+
+.letter__grid {
+  display: grid;
+  gap: clamp(1.8rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.letter__photo {
+  position: relative;
+  overflow: hidden;
+}
+
+.letter__photo::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(252, 250, 247, 0.45);
+  pointer-events: none;
+}
+
+.letter__photo img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.letter__text p + p {
+  margin-top: 1rem;
+}
+
+.letter__text p {
+  color: var(--ink-2);
+  max-width: 48ch;
+}
+
+.letter__sign {
+  font-family: var(--script);
+  font-size: 1.9rem;
+  color: var(--green);
+  margin-top: 1.6rem !important;
+}
+
+@media (min-width: 860px) {
+  .letter__grid {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+}
+
+/* ================= CÔ DÂU & CHÚ RỂ ================= */
+.pair__grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3rem);
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.person {
+  text-align: center;
+}
+
+.person__photo {
+  position: relative;
+  margin: 0 0 1.3rem;
+  overflow: hidden;
+  border-radius: 50% 50% 4px 4px / 32% 32% 4px 4px;
+}
+
+.person__photo img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  transition: transform 1.1s var(--ease-out);
+}
+
+.person:hover .person__photo img {
+  transform: scale(1.045);
+}
+
+.person__role {
+  font-size: 0.66rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--blush);
+}
+
+.person__name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 1.1rem + 2.4vw, 2.6rem);
+  line-height: 1.15;
+  margin-top: 0.2rem;
+}
+
+.person__meta {
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 0.25rem;
+}
+
+.person__parents {
+  margin-top: 0.8rem;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+.pair__amp {
+  width: 96px;
+  height: 48px;
+  margin-inline: auto;
+  color: var(--blush);
+}
+
+@media (min-width: 860px) {
+  .pair__grid {
+    grid-template-columns: 1fr auto 1fr;
+  }
+}
+
+/* ================= THIỆP ================= */
+.invite {
+  background: linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 45%);
+  perspective: 1600px;
+}
+
+.card3d {
+  width: min(100% - 2 * var(--gap), 640px);
+  margin-inline: auto;
+  transform-style: preserve-3d;
+}
+
+.card3d__inner {
+  position: relative;
+  padding: clamp(2.2rem, 7vw, 3.8rem) clamp(1.4rem, 6vw, 3.2rem);
+  text-align: center;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-md);
+  background-image: radial-gradient(circle at 12% 8%, rgba(227, 169, 178, 0.1), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(175, 192, 176, 0.14), transparent 46%);
+}
+
+.card3d__inner::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+
+.card__families {
+  display: grid;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.family__title {
+  font-size: 0.68rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--green-2);
+  margin-bottom: 0.5rem;
+}
+
+.family__name {
+  font-size: 0.96rem;
+  color: var(--ink);
+}
+
+.family__addr {
+  margin-top: 0.4rem;
+  font-size: 0.84rem;
+  color: var(--ink-3);
+  line-height: 1.55;
+}
+
+.family__sep span {
+  display: block;
+  width: 1px;
+  height: 100%;
+  min-height: 48px;
+  margin-inline: auto;
+  background: var(--line);
+}
+
+.card__announce {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+
+.card__announce strong {
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.card__couple {
+  margin: 1.6rem 0;
+}
+
+.card__person {
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 1.2rem + 3.2vw, 2.9rem);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+}
+
+.card__role {
+  font-size: 0.72rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 0.15rem;
+}
+
+.card__amp {
+  font-family: var(--script);
+  font-size: 2rem;
+  color: var(--blush);
+  margin: 0.5rem 0;
+}
+
+.card__when p,
+.card__party p {
+  font-size: 0.92rem;
+  color: var(--ink-2);
+}
+
+.card__hour {
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink) !important;
+  margin-top: 0.5rem;
+}
+
+.card__day {
+  color: var(--ink) !important;
+  letter-spacing: 0.04em;
+}
+
+.card__lunar {
+  font-size: 0.82rem !important;
+  color: var(--ink-3) !important;
+}
+
+.card__divider {
+  width: 92px;
+  height: 46px;
+  margin: 1.8rem auto;
+  color: var(--sage);
+}
+
+.card__invite {
+  font-size: 0.7rem !important;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--green-2) !important;
+}
+
+.card__guest {
+  font-family: var(--script);
+  font-size: 2rem !important;
+  color: var(--green) !important;
+  margin: 0.2rem 0 0.9rem;
+}
+
+.card__venue {
+  font-family: var(--serif);
+  font-size: 1.9rem !important;
+  letter-spacing: 0.12em;
+  color: var(--ink) !important;
+  margin-top: 0.9rem;
+}
+
+.card__hall {
+  font-weight: 500;
+  color: var(--ink) !important;
+}
+
+.card__addr {
+  font-size: 0.86rem !important;
+}
+
+.card__foot {
+  margin-top: 2rem;
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--ink-2);
+}
+
+@media (min-width: 620px) {
+  .card__families {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+}
+
+/* ================= CHƯƠNG TRÌNH ================= */
+.events {
+  background: var(--paper-warm);
+}
+
+.timeline {
+  position: relative;
+  list-style: none;
+  padding: 0 0 0 2.1rem;
+  margin: 0;
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.2rem);
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--line);
+  transform-origin: top;
+  scale: 1 var(--tl-progress, 1);
+}
+
+.tl__dot {
+  position: absolute;
+  left: 0;
+  margin-top: 0.4rem;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--green-2);
+  background: var(--paper);
+}
+
+.tl__dot::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--blush);
+}
+
+.tl {
+  position: relative;
+}
+
+.tl__time {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+}
+
+.tl__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.1rem);
+  margin-top: 0.1rem;
+}
+
+.tl__place {
+  margin-top: 0.3rem;
+  color: var(--ink);
+}
+
+.tl__addr {
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+.tl__map {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--green-2);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 2px;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.tl__map:hover {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+/* ================= ALBUM ================= */
+.album__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(0.5rem, 2vw, 1.2rem);
+  margin-top: 1rem;
+}
+
+.shot {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: var(--paper-deep);
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shot img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease-out), filter 0.6s;
+}
+
+.shot:hover img {
+  transform: scale(1.05);
+}
+
+.shot figcaption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 2.6rem 1rem 0.9rem;
+  background: linear-gradient(180deg, transparent, rgba(30, 26, 22, 0.55));
+  color: var(--paper);
+  font-size: 0.66rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.45s var(--ease-soft), transform 0.45s var(--ease-out);
+}
+
+.shot:hover figcaption,
+.shot:focus-within figcaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.shot--tall {
+  grid-row: span 2;
+}
+
+@media (min-width: 860px) {
+  .album__grid {
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 1fr;
+  }
+
+  .album__grid .shot:nth-child(1) {
+    grid-column: span 5;
+    margin-top: 2.4rem;
+  }
+
+  .album__grid .shot:nth-child(2) {
+    grid-column: span 7;
+  }
+
+  .album__grid .shot:nth-child(3) {
+    grid-column: span 7;
+  }
+
+  .album__grid .shot:nth-child(4) {
+    grid-column: span 5;
+    margin-top: -2.4rem;
+  }
+}
+
+/* ================= ĐỊA ĐIỂM ================= */
+.venue {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-warm) 100%);
+}
+
+.venue__addr {
+  color: var(--ink-2);
+  letter-spacing: 0.04em;
+}
+
+.venue__map {
+  width: min(100% - 2 * var(--gap), 1000px);
+  margin: clamp(1.6rem, 4vw, 2.6rem) auto 0;
+  padding: clamp(0.8rem, 2.5vw, 1.6rem);
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-md);
+  cursor: zoom-in;
+}
+
+.venue__map img {
+  width: 100%;
+}
+
+.venue__map figcaption {
+  margin-top: 0.8rem;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ================= RSVP ================= */
+.rsvp {
+  background: var(--paper-warm);
+}
+
+.rsvp__note {
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+/* ================= LỜI CHÚC ================= */
+.wishes__grid {
+  display: grid;
+  gap: clamp(0.8rem, 2vw, 1.2rem);
+  grid-template-columns: 1fr;
+  margin-top: 0.6rem;
+}
+
+.wish {
+  padding: 1.3rem 1.4rem;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+.wish__text {
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.wish__who {
+  margin-top: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--green-2);
+}
+
+.wishes__empty {
+  margin-top: 1.4rem;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+@media (min-width: 720px) {
+  .wishes__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1040px) {
+  .wishes__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ================= CHÂN TRANG ================= */
+.footer {
+  padding: clamp(3.4rem, 8vw, 6rem) var(--gap) calc(2.6rem + env(safe-area-inset-bottom));
+  text-align: center;
+  background: var(--green);
+  color: var(--paper-warm);
+}
+
+.footer__mark {
+  width: 96px;
+  height: 48px;
+  margin: 0 auto 1.4rem;
+  color: var(--sage);
+}
+
+.footer__names {
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 1.2rem + 3vw, 3rem);
+  letter-spacing: 0.04em;
+}
+
+.footer__date {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.4em;
+  color: var(--sage);
+}
+
+.footer__thanks {
+  margin: 1.6rem auto 0;
+  max-width: 46ch;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.08rem;
+  color: rgba(246, 239, 230, 0.86);
+}
+
+.footer__top {
+  display: inline-block;
+  margin-top: 2rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(246, 239, 230, 0.4);
+  padding-bottom: 3px;
+}

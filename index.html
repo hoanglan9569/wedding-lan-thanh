@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Hoàng Lân &amp; Kim Thanh · 29.11.2026</title>
+    <meta
+      name="description"
+      content="Thiệp cưới online của Hoàng Lân và Trần Kim Thanh. Lễ thành hôn 09:00 và tiệc cưới 11:00, Chủ Nhật 29.11.2026 tại Kim Center, Đồng Nai."
+    />
+    <meta name="theme-color" content="#fbf8f4" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hoàng Lân &amp; Kim Thanh · 29.11.2026" />
+    <meta
+      property="og:description"
+      content="Trân trọng kính mời bạn đến chung vui cùng gia đình chúng tôi."
+    />
+    <meta property="og:image" content="/photos/van06795-1280.jpg" />
+    <meta property="og:locale" content="vi_VN" />
+    <link rel="preload" as="image" href="/photos/van06795-1600.webp" type="image/webp" />
+  </head>
+  <body>
+    <!-- ================= MÀN MỞ THIỆP ================= -->
+    <div class="intro" id="intro" aria-hidden="false">
+      <div class="intro__paper">
+        <div class="intro__ornament" aria-hidden="true">
+          <svg viewBox="0 0 120 60" class="lotus-line">
+            <use href="#lotus-mark" />
+          </svg>
+        </div>
+        <p class="intro__eyebrow">Trân trọng kính mời</p>
+        <p class="intro__guest" id="intro-guest">Quý khách</p>
+        <div class="intro__rule" aria-hidden="true"><span></span></div>
+        <h1 class="intro__names">
+          <span>Hoàng Lân</span><em>&amp;</em><span>Kim Thanh</span>
+        </h1>
+        <p class="intro__date">29 . 11 . 2026</p>
+        <button class="btn btn--seal" id="intro-open" type="button">
+          <span class="btn__label">Mở thiệp</span>
+        </button>
+        <p class="intro__hint">Thiệp có nhạc nền · bạn có thể tắt bất cứ lúc nào</p>
+      </div>
+    </div>
+
+    <!-- ================= THANH ĐIỀU HƯỚNG ================= -->
+    <header class="topbar" id="topbar">
+      <a class="topbar__mark" href="#hero" aria-label="Về đầu trang">L&amp;T</a>
+      <nav class="topbar__nav" aria-label="Mục lục">
+        <a href="#invitation">Thiệp mời</a>
+        <a href="#events">Chương trình</a>
+        <a href="#album">Album</a>
+        <a href="#venue">Địa điểm</a>
+      </nav>
+      <div class="topbar__actions">
+        <button class="iconbtn" id="music-toggle" type="button" aria-pressed="false" aria-label="Bật nhạc nền">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        </button>
+        <a class="btn btn--ghost btn--sm" href="#rsvp">Xác nhận</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- ================= HERO ================= -->
+      <section class="hero" id="hero">
+        <div class="hero__media" data-parallax="0.18">
+          <picture>
+            <source
+              type="image/webp"
+              srcset="
+                /photos/van06795-640.webp   640w,
+                /photos/van06795-1080.webp 1080w,
+                /photos/van06795-1600.webp 1600w,
+                /photos/van06795-2400.webp 2400w
+              "
+              sizes="100vw"
+            />
+            <img
+              src="/photos/van06795-1280.jpg"
+              alt="Hoàng Lân và Kim Thanh trong vườn"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
+          <div class="hero__veil" aria-hidden="true"></div>
+        </div>
+
+        <canvas class="petals" id="petals" aria-hidden="true"></canvas>
+
+        <div class="hero__inner">
+          <p class="hero__eyebrow" data-reveal="fade">Save the date</p>
+          <h1 class="hero__names">
+            <span class="hero__name" data-split>Hoàng Lân</span>
+            <span class="hero__amp" data-reveal="pop">&amp;</span>
+            <span class="hero__name" data-split>Kim Thanh</span>
+          </h1>
+          <div class="hero__dateline" data-reveal="fade">
+            <span>Chủ Nhật</span>
+            <strong>29 . 11 . 2026</strong>
+            <span>Nhằm ngày 21 tháng 10 năm Bính Ngọ</span>
+          </div>
+        </div>
+
+        <a class="scrollcue" href="#countdown" aria-label="Cuộn xuống">
+          <span>Cuộn xuống</span>
+          <i aria-hidden="true"></i>
+        </a>
+      </section>
+
+      <!-- ================= ĐẾM NGƯỢC ================= -->
+      <section class="section countdown" id="countdown">
+        <div class="shell shell--narrow center">
+          <p class="eyebrow" data-reveal="fade">Còn lại</p>
+          <h2 class="h2" data-reveal="rise">Đếm ngược đến ngày chung đôi</h2>
+          <div class="countdown__grid" id="countdown-grid" data-reveal="stagger">
+            <div class="cd"><span class="cd__num" data-cd="days">00</span><span class="cd__lbl">Ngày</span></div>
+            <div class="cd"><span class="cd__num" data-cd="hours">00</span><span class="cd__lbl">Giờ</span></div>
+            <div class="cd"><span class="cd__num" data-cd="minutes">00</span><span class="cd__lbl">Phút</span></div>
+            <div class="cd"><span class="cd__num" data-cd="seconds">00</span><span class="cd__lbl">Giây</span></div>
+          </div>
+          <p class="countdown__done" id="countdown-done" hidden>Hôm nay là ngày của chúng mình</p>
+          <div class="btnrow" data-reveal="fade">
+            <button class="btn btn--line" id="add-calendar" type="button">Thêm vào lịch</button>
+            <a class="btn btn--line" id="google-calendar" href="#" target="_blank" rel="noopener">Google Calendar</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= LỜI NGỎ ================= -->
+      <section class="section letter" id="letter">
+        <div class="shell letter__grid">
+          <figure class="letter__photo" data-reveal="mask">
+            <picture>
+              <source
+                type="image/webp"
+                srcset="/photos/van06896-640.webp 640w, /photos/van06896-1080.webp 1080w, /photos/van06896-1600.webp 1600w"
+                sizes="(max-width: 860px) 92vw, 46vw"
+              />
+              <img src="/photos/van06896-1280.jpg" alt="Cô dâu chú rể sau bó hoa cưới" loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+          <div class="letter__text">
+            <p class="eyebrow" data-reveal="fade">Lời ngỏ</p>
+            <h2 class="h2" data-reveal="rise">Chúng mình sắp về chung một nhà</h2>
+            <p data-reveal="fade">
+              Có những điều bình thường nhất lại hoá thành điều quý giá nhất: một người để cùng đi hết những
+              ngày rất dài, và một ngày để nói lời hẹn ước trước mặt những người thương yêu.
+            </p>
+            <p data-reveal="fade">
+              Ngày 29.11.2026, chúng mình chính thức nên duyên vợ chồng. Sẽ thật trọn vẹn nếu trong ngày ấy
+              có bạn ở đây, cùng nâng ly, cùng cười, cùng cất giữ một kỷ niệm đẹp cho hai đứa.
+            </p>
+            <p class="letter__sign" data-reveal="fade">Hoàng Lân &amp; Kim Thanh</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CÔ DÂU & CHÚ RỂ ================= -->
+      <section class="section pair" id="pair">
+        <div class="shell center">
+          <p class="eyebrow" data-reveal="fade">Hai nhân vật chính</p>
+          <h2 class="h2" data-reveal="rise">Chú rể &amp; Cô dâu</h2>
+        </div>
+        <div class="shell pair__grid">
+          <article class="person" data-reveal="rise">
+            <figure class="person__photo">
+              <picture>
+                <source type="image/webp" srcset="/photos/van09249-640.webp 640w, /photos/van09249-1080.webp 1080w" sizes="(max-width: 860px) 86vw, 38vw" />
+                <img src="/photos/van09249-1280.jpg" alt="Chú rể Hoàng Lân" loading="lazy" decoding="async" />
+              </picture>
+            </figure>
+            <p class="person__role">Chú rể</p>
+            <h3 class="person__name">Hoàng Lân</h3>
+            <p class="person__meta">Út Nam</p>
+            <p class="person__parents">Con Ông Hoàng Văn Vẽ<br />&amp; Bà Nguyễn Thị Phương</p>
+          </article>
+
+          <div class="pair__amp" aria-hidden="true">
+            <svg viewBox="0 0 120 60" class="lotus-line"><use href="#lotus-mark" /></svg>
+          </div>
+
+          <article class="person" data-reveal="rise">
+            <figure class="person__photo">
+              <picture>
+                <source type="image/webp" srcset="/photos/van06601-640.webp 640w, /photos/van06601-1080.webp 1080w" sizes="(max-width: 860px) 86vw, 38vw" />
+                <img src="/photos/van06601-1280.jpg" alt="Cô dâu Trần Kim Thanh" loading="lazy" decoding="async" />
+              </picture>
+            </figure>
+            <p class="person__role">Cô dâu</p>
+            <h3 class="person__name">Trần Kim Thanh</h3>
+            <p class="person__meta">Trưởng Nữ</p>
+            <p class="person__parents">Con Ông Trần Công Dứt<br />&amp; Bà Nguyễn Thị Hiền</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= THIỆP MỜI ================= -->
+      <section class="section invite" id="invitation">
+        <div class="shell center">
+          <p class="eyebrow" data-reveal="fade">Thiệp mời</p>
+          <h2 class="h2" data-reveal="rise">Trân trọng báo tin</h2>
+        </div>
+
+        <div class="card3d" data-reveal="card">
+          <div class="card3d__inner">
+            <div class="card__families">
+              <div class="family">
+                <p class="family__title">Nhà Trai</p>
+                <p class="family__name">Ông: Hoàng Văn Vẽ</p>
+                <p class="family__name">Bà: Nguyễn Thị Phương</p>
+                <p class="family__addr">Tổ 18, Khu phố 6,<br />Tam Hiệp, Đồng Nai</p>
+              </div>
+              <div class="family__sep" aria-hidden="true"><span></span></div>
+              <div class="family">
+                <p class="family__title">Nhà Gái</p>
+                <p class="family__name">Ông: Trần Công Dứt</p>
+                <p class="family__name">Bà: Nguyễn Thị Hiền</p>
+                <p class="family__addr">Tổ 19, KP. Vườn Dừa,<br />Phước Tân, Đồng Nai</p>
+              </div>
+            </div>
+
+            <p class="card__announce">
+              Trân trọng báo tin<br /><strong>Lễ Thành Hôn</strong> của con chúng tôi
+            </p>
+
+            <div class="card__couple">
+              <p class="card__person">Hoàng Lân</p>
+              <p class="card__role">Út Nam</p>
+              <p class="card__amp">&amp;</p>
+              <p class="card__person">Trần Kim Thanh</p>
+              <p class="card__role">Trưởng Nữ</p>
+            </div>
+
+            <div class="card__when">
+              <p>Hôn lễ được cử hành tại tư gia</p>
+              <p class="card__hour">Vào lúc 09 giờ 00</p>
+              <p class="card__day">Chủ Nhật, ngày 29 tháng 11 năm 2026</p>
+              <p class="card__lunar">(Nhằm ngày 21 tháng 10 năm Bính Ngọ)</p>
+            </div>
+
+            <div class="card__divider" aria-hidden="true">
+              <svg viewBox="0 0 120 60" class="lotus-line"><use href="#lotus-mark" /></svg>
+            </div>
+
+            <div class="card__party">
+              <p class="card__invite">Trân trọng kính mời</p>
+              <p class="card__guest" id="card-guest">Quý khách</p>
+              <p>Đến dự buổi tiệc rượu chung vui cùng gia đình chúng tôi tại</p>
+              <p class="card__venue">KIM CENTER</p>
+              <p class="card__hall">Sảnh Grand Opera - Lầu 2</p>
+              <p class="card__addr">628 Phạm Văn Thuận, KP. 5, Tam Hiệp, Đồng Nai</p>
+              <p class="card__hour">Vào lúc 11 giờ 00</p>
+              <p class="card__day">Chủ Nhật, ngày 29 tháng 11 năm 2026</p>
+            </div>
+
+            <p class="card__foot">
+              Sự hiện diện của Quý khách<br />là niềm vinh hạnh của gia đình chúng tôi.
+            </p>
+          </div>
+        </div>
+
+        <div class="shell center">
+          <div class="btnrow" data-reveal="fade">
+            <button class="btn btn--line btn--sm" id="view-original" type="button">Xem thiệp giấy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CHƯƠNG TRÌNH ================= -->
+      <section class="section events" id="events">
+        <div class="shell center">
+          <p class="eyebrow" data-reveal="fade">Chương trình</p>
+          <h2 class="h2" data-reveal="rise">Ngày 29 tháng 11</h2>
+        </div>
+        <div class="shell shell--narrow">
+          <ol class="timeline" id="timeline">
+            <li class="tl" data-reveal="rise">
+              <div class="tl__dot" aria-hidden="true"></div>
+              <p class="tl__time">09:00</p>
+              <h3 class="tl__title">Lễ Thành Hôn</h3>
+              <p class="tl__place">Tư gia nhà trai</p>
+              <p class="tl__addr">Tổ 18, Khu phố 6, Tam Hiệp, Đồng Nai</p>
+              <a class="tl__map" data-map="Tổ 18, Khu phố 6, Tam Hiệp, Đồng Nai" href="#" target="_blank" rel="noopener">Chỉ đường</a>
+            </li>
+            <li class="tl" data-reveal="rise">
+              <div class="tl__dot" aria-hidden="true"></div>
+              <p class="tl__time">11:00</p>
+              <h3 class="tl__title">Tiệc Cưới</h3>
+              <p class="tl__place">Kim Center · Sảnh Grand Opera - Lầu 2</p>
+              <p class="tl__addr">628 Phạm Văn Thuận, KP. 5, Tam Hiệp, Đồng Nai</p>
+              <a class="tl__map" data-map="Kim Center 628 Phạm Văn Thuận, Tam Hiệp, Biên Hòa, Đồng Nai" href="#" target="_blank" rel="noopener">Chỉ đường</a>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ================= ALBUM ================= -->
+      <section class="section album" id="album">
+        <div class="shell center">
+          <p class="eyebrow" data-reveal="fade">Album</p>
+          <h2 class="h2" data-reveal="rise">Khoảnh khắc của chúng mình</h2>
+        </div>
+        <div class="shell album__grid" id="album-grid"></div>
+      </section>
+
+      <!-- ================= ĐỊA ĐIỂM ================= -->
+      <section class="section venue" id="venue">
+        <div class="shell center">
+          <p class="eyebrow" data-reveal="fade">Địa điểm</p>
+          <h2 class="h2" data-reveal="rise">Đường đến Kim Center</h2>
+          <p class="venue__addr" data-reveal="fade">628 Phạm Văn Thuận, KP. 5, Tam Hiệp, Đồng Nai</p>
+        </div>
+        <figure class="venue__map" data-reveal="mask" id="venue-map">
+          <picture>
+            <source type="image/webp" srcset="/map/map-kim-center-900.webp 900w, /map/map-kim-center-1400.webp 1400w, /map/map-kim-center-1874.webp 1874w" sizes="(max-width: 860px) 94vw, 80vw" />
+            <img src="/map/map-kim-center.jpg" alt="Bản đồ đường đến Kim Center, 628 Phạm Văn Thuận, Tam Hiệp, Đồng Nai" loading="lazy" decoding="async" />
+          </picture>
+          <figcaption>Chạm vào bản đồ để xem lớn · quét mã QR trên bản đồ để mở chỉ dẫn</figcaption>
+        </figure>
+        <div class="shell center">
+          <div class="btnrow" data-reveal="fade">
+            <a class="btn btn--line" id="venue-directions" href="#" target="_blank" rel="noopener">Mở Google Maps</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= XÁC NHẬN THAM DỰ ================= -->
+      <section class="section rsvp" id="rsvp">
+        <div class="shell shell--narrow">
+          <div class="center">
+            <p class="eyebrow" data-reveal="fade">Xác nhận tham dự</p>
+            <h2 class="h2" data-reveal="rise">Bạn sẽ đến chứ?</h2>
+            <p class="rsvp__note" data-reveal="fade">
+              Phản hồi giúp hai bên gia đình chuẩn bị chu đáo hơn. Hạn xác nhận: 20 . 11 . 2026
+            </p>
+          </div>
+
+          <form class="form" id="rsvp-form" data-reveal="stagger" novalidate>
+            <div class="field">
+              <label for="f-name">Họ và tên</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Nguyễn Văn A" />
+            </div>
+
+            <div class="field">
+              <span class="field__label">Bạn là khách của</span>
+              <div class="choices" role="radiogroup" aria-label="Bạn là khách của">
+                <label class="choice"><input type="radio" name="side" value="Nhà trai" checked /><span>Nhà trai</span></label>
+                <label class="choice"><input type="radio" name="side" value="Nhà gái" /><span>Nhà gái</span></label>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field__label">Tham dự</span>
+              <div class="choices" role="radiogroup" aria-label="Tham dự">
+                <label class="choice"><input type="radio" name="attend" value="Có" checked /><span>Có, mình sẽ đến</span></label>
+                <label class="choice"><input type="radio" name="attend" value="Không" /><span>Rất tiếc, mình bận</span></label>
+              </div>
+            </div>
+
+            <div class="field" id="guests-field">
+              <label for="f-guests">Số người tham dự</label>
+              <input id="f-guests" name="guests" type="number" min="1" max="10" value="1" inputmode="numeric" />
+            </div>
+
+            <div class="field">
+              <label for="f-wish">Lời chúc gửi cô dâu chú rể</label>
+              <textarea id="f-wish" name="wish" rows="3" placeholder="Chúc hai bạn trăm năm hạnh phúc..."></textarea>
+            </div>
+
+            <button class="btn btn--solid" type="submit" id="rsvp-submit">Gửi xác nhận</button>
+            <p class="form__status" id="rsvp-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= LỜI CHÚC ================= -->
+      <section class="section wishes" id="wishes">
+        <div class="shell center">
+          <p class="eyebrow" data-reveal="fade">Sổ lưu bút</p>
+          <h2 class="h2" data-reveal="rise">Lời chúc đã gửi</h2>
+        </div>
+        <div class="shell wishes__grid" id="wishes-grid"></div>
+        <p class="wishes__empty center" id="wishes-empty">Hãy là người đầu tiên gửi lời chúc cho chúng mình.</p>
+      </section>
+    </main>
+
+    <!-- ================= CHÂN TRANG ================= -->
+    <footer class="footer">
+      <div class="footer__mark" aria-hidden="true">
+        <svg viewBox="0 0 120 60" class="lotus-line"><use href="#lotus-mark" /></svg>
+      </div>
+      <p class="footer__names">Hoàng Lân &amp; Kim Thanh</p>
+      <p class="footer__date">29 . 11 . 2026</p>
+      <p class="footer__thanks">Sự hiện diện của Quý khách là niềm vinh hạnh của gia đình chúng tôi.</p>
+      <a class="footer__top" href="#hero">Về đầu trang</a>
+    </footer>
+
+    <!-- ================= LIGHTBOX ================= -->
+    <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Xem ảnh">
+      <button class="lightbox__close" id="lb-close" type="button" aria-label="Đóng">&times;</button>
+      <button class="lightbox__nav lightbox__nav--prev" id="lb-prev" type="button" aria-label="Ảnh trước">&#8249;</button>
+      <figure class="lightbox__stage">
+        <img id="lb-img" src="" alt="" />
+        <figcaption id="lb-cap"></figcaption>
+      </figure>
+      <button class="lightbox__nav lightbox__nav--next" id="lb-next" type="button" aria-label="Ảnh sau">&#8250;</button>
+    </div>
+
+    <!-- Hoa sen vẽ nét, dùng lại nhiều nơi -->
+    <svg class="svg-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <g id="lotus-mark">
+          <path d="M60 48c-9 0-16-6-16-13 0-5 3-9 8-11-1 6 2 11 8 13-3-7-2-15 4-21 6 6 7 14 4 21 6-2 9-7 8-13 5 2 8 6 8 11 0 7-7 13-16 13z" />
+          <path d="M28 48c6 4 14 6 22 6M92 48c-6 4-14 6-22 6" />
+          <path d="M60 54v6" />
+        </g>
+      </defs>
+    </svg>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+.env
+.env.*
+!.env.example
+
+# Raw camera originals (4600x6900, ~65 MB) stay off git.
+# Re-download with scripts/fetch-originals.ps1 (Drive file ids in README).
+assets-src/originals/
