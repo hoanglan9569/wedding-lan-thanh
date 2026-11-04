@@ -3,6 +3,9 @@
 Trang thiệp cưới một trang (single page), tiếng Việt, chỉ theme sáng, chạy mượt trên điện thoại.
 Lễ thành hôn 09:00 và tiệc cưới 11:00, Chủ Nhật 29.11.2026, Kim Center - Sảnh Grand Opera, Đồng Nai.
 
+**Đang chạy tại: https://lanthanh.pages.dev**
+Công cụ tạo link mời riêng cho từng khách: https://lanthanh.pages.dev/moi.html
+
 ## Chạy thử
 
 ```bash
@@ -72,14 +75,31 @@ thuộc phạm vi công cộng. Nguồn và giấy phép: `public/audio/CREDITS.
 
 ## RSVP
 
-Mặc định form lưu phản hồi trên máy khách (localStorage) và hiện ngay ở phần "Lời chúc".
-Muốn nhận phản hồi về một nơi tập trung, tạo `.env`:
+Khách bấm gửi thì phản hồi đi hai nơi: hiện ngay ở phần "Lời chúc" trên máy khách, và gửi về
+Cloudflare Worker `lanthanh-rsvp` (https://lanthanh-rsvp.hoanglan9569.workers.dev) lưu trong KV.
+Worker không có đường nào đọc ngược dữ liệu ra, nên không cần mật khẩu nào cả.
 
-```
-VITE_RSVP_ENDPOINT=https://<worker-cua-ban>/rsvp
+Đọc phản hồi trên máy đã đăng nhập wrangler:
+
+```bash
+bun run rsvp:list                                   # liệt kê các khoá reply:...
+cd worker && bunx wrangler kv key get "<khoá>" --binding RSVP --remote
 ```
 
+Mã nguồn và hướng dẫn: `worker/` (`bun run rsvp:deploy` để đẩy lại).
+Đổi chỗ nhận: đặt `VITE_RSVP_ENDPOINT=https://...` trong `.env`.
 Endpoint nhận `POST` JSON: `{ name, side, attend, guests, wish, at }`.
+
+## Đưa lên mạng
+
+Trang chạy trên Cloudflare Pages (dự án `lanthanh`, tài khoản hoanglan9569@gmail.com):
+
+```bash
+bun run deploy       # build rồi đẩy thư mục dist lên Cloudflare Pages
+```
+
+Muốn gắn tên miền riêng: Cloudflare dashboard > Workers & Pages > lanthanh > Custom domains.
+Sau khi đổi tên miền nhớ sửa `canonical`, `og:url`, `og:image` trong `index.html`.
 
 ## Kiểm tra giao diện
 

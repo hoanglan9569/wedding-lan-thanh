@@ -149,6 +149,11 @@ a {
   padding-block: var(--section-y);
 }
 
+/* Nhảy tới mục nào thì chừa chỗ cho thanh điều hướng cố định */
+section[id] {
+  scroll-margin-top: 74px;
+}
+
 .center {
   text-align: center;
 }

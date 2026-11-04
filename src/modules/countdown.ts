@@ -25,15 +25,16 @@ function flip(el: HTMLElement, value: string): void {
     el.textContent = value;
     return;
   }
+  // Không bao giờ để opacity về 0: chữ số luôn đọc được, kể cả ngay lúc lật
   gsap.timeline()
-    .to(el, { yPercent: -42, opacity: 0, duration: 0.2, ease: 'power2.in' })
+    .to(el, { yPercent: -26, opacity: 0.28, duration: 0.13, ease: 'power2.in' })
     .add(() => {
       el.textContent = value;
     })
     .fromTo(
       el,
-      { yPercent: 42, opacity: 0 },
-      { yPercent: 0, opacity: 1, duration: 0.34, ease: 'power3.out' },
+      { yPercent: 26, opacity: 0.28 },
+      { yPercent: 0, opacity: 1, duration: 0.27, ease: 'power3.out' },
     );
 }
 

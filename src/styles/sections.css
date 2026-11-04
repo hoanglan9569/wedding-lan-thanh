@@ -612,6 +612,7 @@
 .album__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  align-items: start;
   gap: clamp(0.5rem, 2vw, 1.2rem);
   margin-top: 1rem;
 }
@@ -658,32 +659,14 @@
   transform: translateY(0);
 }
 
-.shot--tall {
-  grid-row: span 2;
-}
-
 @media (min-width: 860px) {
   .album__grid {
-    grid-template-columns: repeat(12, 1fr);
-    grid-auto-rows: 1fr;
+    gap: clamp(1rem, 2.4vw, 2rem);
   }
 
-  .album__grid .shot:nth-child(1) {
-    grid-column: span 5;
-    margin-top: 2.4rem;
-  }
-
-  .album__grid .shot:nth-child(2) {
-    grid-column: span 7;
-  }
-
-  .album__grid .shot:nth-child(3) {
-    grid-column: span 7;
-  }
-
-  .album__grid .shot:nth-child(4) {
-    grid-column: span 5;
-    margin-top: -2.4rem;
+  /* So le hai cột cho có nhịp, ảnh vẫn giữ đúng khung dọc 2:3 */
+  .album__grid .shot:nth-child(even) {
+    margin-top: clamp(2rem, 5vw, 4.5rem);
   }
 }
 

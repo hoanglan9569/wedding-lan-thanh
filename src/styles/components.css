@@ -32,7 +32,15 @@
     background-size 0.5s var(--ease-out), transform 0.4s var(--ease-out);
 }
 
-.btn:hover,
+/* Chỉ máy có chuột mới đổi màu khi rê; chạm trên điện thoại không bị kẹt trạng thái hover */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    color: var(--btn-fill-fg);
+    border-color: var(--btn-fill);
+    background-size: 100% 100%;
+  }
+}
+
 .btn:focus-visible {
   color: var(--btn-fill-fg);
   border-color: var(--btn-fill);
@@ -41,6 +49,7 @@
 
 .btn:active {
   transform: scale(0.97);
+  border-color: var(--btn-fill);
 }
 
 .btn--sm {

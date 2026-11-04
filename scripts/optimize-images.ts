@@ -8,6 +8,7 @@ interface GeneratedFile {
 }
 
 const MAX_WEBP_BYTES = 420 * 1024; // 420 KB
+const MAX_OG_BYTES = 220 * 1024; // 220 KB
 
 async function ensureDirs(dirs: string[]): Promise<void> {
   for (const dir of dirs) {
@@ -118,6 +119,30 @@ async function processInvitation(
   return results;
 }
 
+async function processOg(
+  input: string,
+  outPath: string
+): Promise<GeneratedFile> {
+  let quality = 82;
+  let buffer: Buffer;
+
+  while (true) {
+    buffer = await sharp(input)
+      .extract({ left: 0, top: 1250, width: 4672, height: 2520 })
+      .resize(1200, 630)
+      .jpeg({ quality, progressive: true, mozjpeg: true })
+      .toBuffer();
+
+    if (buffer.length <= MAX_OG_BYTES || quality <= 50) {
+      break;
+    }
+    quality -= 4;
+  }
+
+  await fs.promises.writeFile(outPath, buffer);
+  return { relPath: outPath.replace(/\\/g, '/'), bytes: buffer.length };
+}
+
 async function buildManifest(
   items: { input: string; slug: string }[]
 ): Promise<void> {
@@ -160,11 +185,14 @@ async function main(): Promise<void> {
     input: path.join('assets-src', 'invitation-nha-trai.jpg'),
     slug: 'invitation-nha-trai',
   };
+  const ogInput = path.join('assets-src', 'originals', 'VAN06795.jpg');
+  const ogOut = path.join('public', 'og.jpg');
 
   const allGenerated: GeneratedFile[] = [];
   allGenerated.push(...(await processPhotos(photos)));
   allGenerated.push(...(await processMap(mapItem.input, mapItem.slug)));
   allGenerated.push(...(await processInvitation(invitationItem.input, invitationItem.slug)));
+  allGenerated.push(await processOg(ogInput, ogOut));
 
   await buildManifest([...photos, mapItem, invitationItem]);
 

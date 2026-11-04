@@ -37,7 +37,8 @@ export function lockScroll(locked: boolean): void {
 export function scrollToSection(hash: string): void {
   const target = document.querySelector<HTMLElement>(hash);
   if (!target) return;
-  if (lenis) lenis.scrollTo(target, { offset: -8, duration: 1.2 });
+  const offset = target.id === 'hero' ? 0 : -74;
+  if (lenis) lenis.scrollTo(target, { offset, duration: 1.2 });
   else target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
 }
 

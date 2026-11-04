@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lanthanh-rsvp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-04",
+  "observability": {
+    "enabled": true
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RSVP",
+      "id": "e8e1be01346f4d75910289ba12c85ce7"
+    }
+  ]
+}

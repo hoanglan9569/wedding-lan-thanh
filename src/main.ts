@@ -11,6 +11,7 @@ import { initGallery } from './modules/gallery';
 import { initRsvp } from './modules/rsvp';
 import { initMusic } from './modules/music';
 import { applyGuestName } from './modules/guest';
+import { initTimelineLine, initOrnaments } from './modules/decor';
 import { initIntro } from './modules/intro';
 
 function boot(): void {
@@ -24,6 +25,8 @@ function boot(): void {
   initHero();
   initTopbar();
   initCardTilt();
+  initTimelineLine();
+  initOrnaments();
   initReveals();
   initAnchors();
 

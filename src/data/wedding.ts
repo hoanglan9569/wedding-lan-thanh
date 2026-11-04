@@ -101,10 +101,12 @@ export const music = {
 
 export const rsvp = {
   /**
-   * Để trống: form sẽ lưu tại máy khách và mở sẵn tin nhắn Zalo/SMS.
-   * Có endpoint (Cloudflare Worker) thì điền VITE_RSVP_ENDPOINT trong .env
+   * Nơi nhận phản hồi: Cloudflare Worker lanthanh-rsvp (ghi vào KV).
+   * Đọc phản hồi bằng `bun run rsvp:list` - xem worker/README.md.
+   * Đổi chỗ nhận thì đặt VITE_RSVP_ENDPOINT trong .env
    */
-  endpoint: import.meta.env.VITE_RSVP_ENDPOINT ?? '',
+  endpoint:
+    import.meta.env.VITE_RSVP_ENDPOINT ?? 'https://lanthanh-rsvp.hoanglan9569.workers.dev/rsvp',
   contactPhone: '',
   deadline: '20 . 11 . 2026',
 } as const;
