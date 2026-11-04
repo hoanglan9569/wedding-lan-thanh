@@ -90,6 +90,42 @@ async function warmUp(page: Page): Promise<void> {
   await page.waitForTimeout(900);
 }
 
+/**
+ * Dấu tiếng Việt chồng hai tầng (ế, ồ, ữ, ặ) phải cao hơn chữ trần.
+ * Phông nào vẽ thiếu dấu thì chiều cao bằng nhau: báo lỗi ngay tại đây.
+ */
+async function diacritics(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    // 'duoi' = dấu nằm dưới chữ (nặng), phải đo phần chìm thay vì phần nhô
+    const pairs: [string, string, 'tren' | 'duoi'][] = [
+      ['ế', 'ê', 'tren'],
+      ['ồ', 'ô', 'tren'],
+      ['ữ', 'ư', 'tren'],
+      ['ỗ', 'ô', 'tren'],
+      ['ặ', 'ă', 'duoi'],
+      ['ọ', 'o', 'duoi'],
+    ];
+    const fonts = ['Playfair Display', 'Be Vietnam Pro', 'Dancing Script'];
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return ['không đo được'];
+    const bad: string[] = [];
+    for (const font of fonts) {
+      ctx.font = `64px "${font}"`;
+      for (const [marked, plain, side] of pairs) {
+        const read = (text: string): number =>
+          side === 'tren'
+            ? ctx.measureText(text).actualBoundingBoxAscent
+            : ctx.measureText(text).actualBoundingBoxDescent;
+        const a = read(marked);
+        const b = read(plain);
+        if (a - b < 1.5) bad.push(`${font} "${marked}" ${a.toFixed(1)} = "${plain}" ${b.toFixed(1)}`);
+      }
+    }
+    return bad;
+  });
+}
+
 /** Đo tương phản chữ trên nền theo công thức WCAG: dễ đọc mà không chói. */
 async function contrast(page: Page): Promise<string[]> {
   return page.evaluate(() => {
@@ -186,6 +222,8 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   const hidden = await stillHidden(page);
   checks.push(`còn mờ sau khi cuộn: ${hidden.length ? hidden.join(' | ') : 'không có'}`);
   checks.push(`tương phản: ${(await contrast(page)).join(' · ')}`);
+  const marks = await diacritics(page);
+  checks.push(`dấu tiếng Việt: ${marks.length ? marks.join(' | ') : 'đủ dấu'}`);
   // Tắt cuộn mượt: nó giành quyền cuộn với trình chụp nên ảnh ghép bị lệch.
   await page.evaluate(() => (window as unknown as { __lenis?: { destroy(): void } }).__lenis?.destroy());
   await page.waitForTimeout(300);

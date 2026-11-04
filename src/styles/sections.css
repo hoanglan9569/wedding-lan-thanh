@@ -68,9 +68,9 @@
 .hero__names {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(2.9rem, 1.4rem + 10vw, 7.4rem);
-  line-height: 0.98;
-  letter-spacing: 0.015em;
+  font-size: clamp(2.4rem, 1.2rem + 8.2vw, 6rem);
+  line-height: 1.04;
+  letter-spacing: 0;
   display: grid;
   gap: 0.1em;
 }
@@ -303,8 +303,8 @@
 .person__name {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(1.7rem, 1.1rem + 2.4vw, 2.6rem);
-  line-height: 1.15;
+  font-size: clamp(1.45rem, 1rem + 1.9vw, 2.15rem);
+  line-height: 1.25;
   margin-top: 0.2rem;
 }
 
@@ -420,9 +420,9 @@
 
 .card__person {
   font-family: var(--serif);
-  font-size: clamp(1.9rem, 1.2rem + 3.2vw, 2.9rem);
-  line-height: 1.12;
-  letter-spacing: 0.04em;
+  font-size: clamp(1.65rem, 1.05rem + 2.5vw, 2.4rem);
+  line-height: 1.22;
+  letter-spacing: 0.01em;
 }
 
 .card__role {
@@ -487,8 +487,8 @@
 
 .card__venue {
   font-family: var(--serif);
-  font-size: 1.9rem !important;
-  letter-spacing: 0.12em;
+  font-size: 1.55rem !important;
+  letter-spacing: 0.1em;
   color: var(--ink) !important;
   margin-top: 0.9rem;
 }
@@ -520,6 +520,16 @@
 /* ================= CHƯƠNG TRÌNH ================= */
 .events {
   background: var(--paper-sage);
+}
+
+.events__date {
+  margin-top: -0.6rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-2);
 }
 
 .timeline {
@@ -834,8 +844,9 @@
 
 .footer__names {
   font-family: var(--serif);
-  font-size: clamp(1.9rem, 1.2rem + 3vw, 3rem);
-  letter-spacing: 0.04em;
+  font-size: clamp(1.65rem, 1.1rem + 2.3vw, 2.5rem);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
 }
 
 .footer__date {

@@ -121,7 +121,7 @@
   inset: 0;
   z-index: 0;
   border-radius: 7px;
-  background: linear-gradient(158deg, #fdf9f6 0%, #f8ece8 100%);
+  background: linear-gradient(158deg, #fffdfb 0%, #fbf4f1 100%);
   border: 1px solid rgba(58, 51, 46, 0.09);
   box-shadow: 0 24px 44px rgba(132, 94, 86, 0.2);
 }
@@ -235,9 +235,9 @@
   z-index: 5;
   transform-origin: top center;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
-  background: linear-gradient(176deg, #f9eee9 0%, #f2e0db 100%);
-  border-top: 1px solid rgba(58, 51, 46, 0.08);
-  box-shadow: 0 6px 14px rgba(132, 94, 86, 0.12);
+  /* đậm hơn thân phong bì rõ rệt, nếu không thì lúc lật trông như biến mất */
+  background: linear-gradient(176deg, #f6e4de 0%, #eed6cf 58%, #e4c9c3 100%);
+  filter: drop-shadow(0 4px 8px rgba(132, 94, 86, 0.26));
 }
 
 /* dấu niêm phong = nút mở */
