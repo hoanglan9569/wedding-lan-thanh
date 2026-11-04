@@ -546,7 +546,7 @@
 
 .tl__dot {
   position: absolute;
-  left: 0;
+  left: -2.1rem;
   margin-top: 0.4rem;
   width: 15px;
   height: 15px;

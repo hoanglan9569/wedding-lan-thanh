@@ -3,6 +3,8 @@
   --btn-bg: transparent;
   --btn-fg: var(--ink);
   --btn-bd: var(--line);
+  --btn-fill: var(--green);
+  --btn-fill-fg: var(--paper);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -11,7 +13,12 @@
   padding: 0.92rem 2.1rem;
   border: 1px solid var(--btn-bd);
   border-radius: 999px;
-  background: var(--btn-bg);
+  /* Nền chạy lên bằng background-image: chữ luôn nằm trên, kể cả chữ trần */
+  background-color: var(--btn-bg);
+  background-image: linear-gradient(var(--btn-fill), var(--btn-fill));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 100% 0%;
   color: var(--btn-fg);
   font-family: var(--sans);
   font-size: 0.74rem;
@@ -22,33 +29,14 @@
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.4s var(--ease-soft), border-color 0.4s var(--ease-soft),
-    transform 0.4s var(--ease-out);
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--green);
-  transform: translateY(101%);
-  transition: transform 0.5s var(--ease-out);
-  z-index: 0;
-}
-
-.btn > * {
-  position: relative;
-  z-index: 1;
+    background-size 0.5s var(--ease-out), transform 0.4s var(--ease-out);
 }
 
 .btn:hover,
 .btn:focus-visible {
-  color: var(--paper);
-  border-color: var(--green);
-}
-
-.btn:hover::before,
-.btn:focus-visible::before {
-  transform: translateY(0);
+  color: var(--btn-fill-fg);
+  border-color: var(--btn-fill);
+  background-size: 100% 100%;
 }
 
 .btn:active {
@@ -64,10 +52,8 @@
   --btn-bg: var(--green);
   --btn-fg: var(--paper);
   --btn-bd: var(--green);
-}
-
-.btn--solid::before {
-  background: var(--ink);
+  --btn-fill: var(--ink);
+  --btn-fill-fg: var(--paper);
 }
 
 .btn--ghost {

@@ -30,19 +30,34 @@ function makePetal(w: number, h: number, top = false): Petal {
     drift: (Math.random() - 0.5) * 26,
     spin: (Math.random() - 0.5) * 1.4,
     angle: Math.random() * Math.PI * 2,
-    alpha: 0.26 + Math.random() * 0.34,
+    alpha: 0.18 + Math.random() * 0.3,
     hue: Math.floor(Math.random() * COLORS.length),
   };
 }
 
+function petalFill(ctx: CanvasRenderingContext2D, p: Petal): CanvasGradient {
+  const rgb = COLORS[p.hue] ?? COLORS[0];
+  const grad = ctx.createLinearGradient(0, -p.size, 0, p.size);
+  grad.addColorStop(0, `rgba(${rgb}, 0.12)`);
+  grad.addColorStop(0.55, `rgba(${rgb}, 0.9)`);
+  grad.addColorStop(1, `rgba(${rgb}, 0.3)`);
+  return grad;
+}
+
 function drawPetal(ctx: CanvasRenderingContext2D, p: Petal): void {
+  const r = p.size;
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.rotate(p.angle);
+  // chao nghiêng như cánh hoa thật: bề ngang hẹp lại rồi mở ra
+  ctx.scale(Math.max(0.3, Math.abs(Math.cos(p.angle * 0.85))), 1);
   ctx.globalAlpha = p.alpha;
-  ctx.fillStyle = `rgba(${COLORS[p.hue] ?? COLORS[0]}, 1)`;
+  ctx.fillStyle = petalFill(ctx, p);
   ctx.beginPath();
-  ctx.ellipse(0, 0, p.size * 0.52, p.size, 0, 0, Math.PI * 2);
+  ctx.moveTo(0, -r);
+  ctx.bezierCurveTo(r * 0.74, -r * 0.42, r * 0.6, r * 0.62, 0, r);
+  ctx.bezierCurveTo(-r * 0.6, r * 0.62, -r * 0.74, -r * 0.42, 0, -r);
+  ctx.closePath();
   ctx.fill();
   ctx.restore();
 }
