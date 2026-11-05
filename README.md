@@ -133,11 +133,19 @@ Script báo lỗi console và tràn ngang; cần Playwright (`bun add -d playwri
 
 ## Kỹ thuật
 
-Vite 8 + TypeScript 7, GSAP 3.15 (ScrollTrigger, SplitText), Lenis 1.3 (chỉ bật cho chuột; điện thoại
-dùng cuộn gốc của hệ điều hành), phông tự host: Playfair Display + Be Vietnam Pro + Dancing Script.
+Vite 8 + TypeScript 7, lõi hoạt hình WebAssembly 4,6 KB
+([wasm-motion-core](https://github.com/hoanglan9569/wasm-motion-core), nhúng base64, không còn GSAP
+hay Lenis), phông tự host: Playfair Display + Be Vietnam Pro + Dancing Script.
 
+- Mọi con số của hoạt hình do wasm tính: tween, parallax theo cuộn, cuộn mượt, nghiêng thiệp, đếm
+  ngược và mưa cánh hoa (lõi trả thẳng ma trận canvas). JS chỉ ghi style và vẽ canvas.
+- Đổi lõi: sửa bên `repos/wasm-motion-core`, `bun run build` ở đó rồi `bun run sync:core` ở đây.
+  Không sửa tay `src/vendor/motion-core/`.
+- So với bản GSAP (đo bằng Chrome CDP, cùng kịch bản cuộn): JS tải về 60,4 KB -> 15,2 KB (-75%),
+  thời gian chạy script 181 ms -> 111 ms (-39%), tổng thời gian tác vụ 1137 ms -> 1043 ms (-8%).
 - Hiệu ứng xuất hiện chạy bằng IntersectionObserver nên cuộn kiểu gì chữ cũng hiện ra, và tôn trọng
   `prefers-reduced-motion`; canvas cánh hoa tự dừng khi rời màn hình hoặc ẩn tab.
+- Không nạp được wasm thì trang thêm `html.no-motion`: mất hoạt hình nhưng nội dung hiện đủ.
 - Tranh trang trí chỉ tải sau khi mở thiệp (`html.is-open`): lần đầu vào trang khoảng 630 KB.
 - Ngày giờ luôn dùng phông không chân vì chữ số 1 của phông có chân trông giống chữ I hoa.
 - `bun scripts/shots.ts` đo sẵn: tràn ngang, lỗi console, phần tử còn mờ, tương phản WCAG

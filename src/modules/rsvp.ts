@@ -1,5 +1,6 @@
 import { rsvp as rsvpConfig } from '../data/wedding';
-import { gsap, reduceMotion, refreshScroll } from './scroll';
+import { reduceMotion, refreshScroll } from './scroll';
+import * as anim from '../vendor/motion-core/anim';
 
 const KEY = 'lanthanh:wishes';
 
@@ -51,7 +52,11 @@ export function renderWishes(list: Reply[]): void {
   grid.replaceChildren(...withText.slice().reverse().map(wishCard));
   if (empty) empty.hidden = withText.length > 0;
   if (!reduceMotion && withText.length) {
-    gsap.from(grid.children, { opacity: 0, y: 20, duration: 0.7, stagger: 0.06, ease: 'power3.out' });
+    Array.from(grid.children).forEach((child, i) => {
+      if (child instanceof HTMLElement) {
+        anim.fromTo(child, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: 0.7, delay: i * 0.06 });
+      }
+    });
   }
   refreshScroll();
 }
@@ -79,15 +84,17 @@ function burst(origin: HTMLElement): void {
       'position:fixed;z-index:140;width:9px;height:13px;border-radius:50%;pointer-events:none;' +
       `background:${i % 2 ? '#e3a9b2' : '#f7e4e6'};left:${rect.left + rect.width / 2}px;top:${rect.top}px;`;
     document.body.appendChild(dot);
-    gsap.to(dot, {
-      x: (Math.random() - 0.5) * 320,
-      y: -120 - Math.random() * 220,
-      rotation: Math.random() * 320,
-      opacity: 0,
-      duration: 1.3 + Math.random(),
-      ease: 'power2.out',
-      onComplete: () => dot.remove(),
-    });
+    anim.fromTo(
+      dot,
+      { x: 0, y: 0, rotate: 0, opacity: 1 },
+      {
+        x: (Math.random() - 0.5) * 320,
+        y: -120 - Math.random() * 220,
+        rotate: Math.random() * 320,
+        opacity: 0,
+      },
+      { duration: 1.3 + Math.random(), ease: 'out2', onComplete: () => dot.remove() },
+    );
   }
 }
 

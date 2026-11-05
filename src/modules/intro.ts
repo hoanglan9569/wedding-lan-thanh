@@ -1,4 +1,6 @@
-import { gsap, reduceMotion, lockScroll, refreshScroll } from './scroll';
+import * as anim from '../vendor/motion-core/anim';
+import { getCore } from '../vendor/motion-core/core';
+import { reduceMotion, lockScroll, refreshScroll } from './scroll';
 import { playHeroIntro } from './hero';
 import { startMusic, musicWanted } from './music';
 
@@ -15,7 +17,11 @@ function finish(overlay: HTMLElement, playHero: boolean): void {
   if (musicWanted()) void startMusic();
 }
 
-/** Bẻ dấu niêm phong, mở nắp, rút tấm thiệp lên rồi tan vào ảnh cưới. */
+/**
+ * Bẻ dấu niêm phong, mở nắp, rút tấm thiệp lên rồi tan vào ảnh cưới.
+ * Mốc thời gian (giây) giữ nguyên như bản GSAP cũ; `hold` để tween chờ đúng
+ * lượt mới chạm vào phần tử.
+ */
 function openSequence(overlay: HTMLElement, done: () => void): void {
   const flap = overlay.querySelector<HTMLElement>('#env-flap');
   const card = overlay.querySelector<HTMLElement>('#env-card');
@@ -23,27 +29,54 @@ function openSequence(overlay: HTMLElement, done: () => void): void {
   const hint = overlay.querySelector<HTMLElement>('#intro-hint');
   const front = overlay.querySelector<HTMLElement>('.env__front');
 
-  const tl = gsap.timeline({ onComplete: done, defaults: { overwrite: 'auto' } });
-  tl.to(hint, { opacity: 0, duration: 0.3, ease: 'power1.out' }, 0)
-    // dấu sáp bị bẻ: nảy lên rồi vỡ ra tại chỗ, không trượt xuống đè chữ
-    .to(seal, { scale: 1.18, rotate: -10, duration: 0.2, ease: 'power2.out' }, 0)
-    .to(seal, { scale: 0.52, rotate: 16, opacity: 0, duration: 0.32, ease: 'power2.in' }, 0.2)
-    .to(flap, { rotateX: -168, duration: 1.05, ease: 'power2.inOut' }, 0.3)
-    .set(flap, { zIndex: -2 }, 0.82)
-    .to(front, { opacity: 0, duration: 0.45, ease: 'power1.out' }, 0.5)
-    // thiệp rút lên: đổi lớp đúng lúc còn nằm trong phong bì nên không thấy nhảy lớp
-    .set(card, { zIndex: 6 }, 0.95)
-    .to(card, { yPercent: -62, scale: 1.03, duration: 1.1, ease: 'power3.out' }, 0.98)
-    .to(card, { scale: 1.34, duration: 0.9, ease: 'power2.in' }, '+=0.3')
-    .add(() => playHeroIntro(), '<0.1')
-    .to(overlay, { opacity: 0, duration: 0.62, ease: 'power2.inOut' }, '<0.12');
+  if (hint) anim.to(hint, { opacity: 0 }, { duration: 0.3, ease: 'out2' });
+  if (seal) {
+    anim.fromTo(seal, { scale: 1, rotate: 0 }, { scale: 1.18, rotate: -10 }, { duration: 0.2, ease: 'out2' });
+    anim.fromTo(
+      seal,
+      { scale: 1.18, rotate: -10, opacity: 1 },
+      { scale: 0.52, rotate: 16, opacity: 0 },
+      { delay: 0.2, duration: 0.32, ease: 'in2', hold: true },
+    );
+  }
+  if (flap) {
+    anim.fromTo(flap, { rotateX: 0 }, { rotateX: -168 }, { delay: 0.3, duration: 1.05, ease: 'inOut2', hold: true });
+    anim.after(0.82, () => {
+      flap.style.zIndex = '-2';
+    });
+  }
+  if (front) anim.to(front, { opacity: 0 }, { delay: 0.5, duration: 0.45, ease: 'out2', hold: true });
+  if (card) {
+    anim.after(0.95, () => {
+      card.style.zIndex = '6';
+    });
+    anim.fromTo(
+      card,
+      { yPercent: 0, scale: 1 },
+      { yPercent: -62, scale: 1.03 },
+      { delay: 0.98, duration: 1.1, ease: 'out3', hold: true },
+    );
+    anim.fromTo(card, { scale: 1.03 }, { scale: 1.34 }, { delay: 2.38, duration: 0.9, ease: 'in2', hold: true });
+  }
+  anim.after(2.48, () => playHeroIntro());
+  anim.to(overlay, { opacity: 0 }, { delay: 2.6, duration: 0.62, ease: 'inOut2', hold: true });
+  anim.after(3.28, done);
 }
 
 function entrance(overlay: HTMLElement): void {
   const env = overlay.querySelector<HTMLElement>('#env');
   const hint = overlay.querySelector<HTMLElement>('#intro-hint');
-  gsap.from(env, { opacity: 0, y: 40, scale: 0.94, duration: 1.2, ease: 'power3.out', delay: 0.12 });
-  gsap.from(hint, { opacity: 0, y: 12, duration: 0.9, ease: 'power2.out', delay: 0.8 });
+  if (env) {
+    anim.fromTo(
+      env,
+      { opacity: 0, y: 40, scale: 0.94 },
+      { opacity: 1, y: 0, scale: 1 },
+      { delay: 0.12, duration: 1.2, ease: 'out3' },
+    );
+  }
+  if (hint) {
+    anim.fromTo(hint, { opacity: 0, y: 12 }, { opacity: 1, y: 0 }, { delay: 0.8, duration: 0.9, ease: 'out2' });
+  }
 }
 
 /** Mở được bằng ba cách: bấm dấu niêm phong, cuộn xuống, hoặc bàn phím. */
@@ -85,15 +118,16 @@ export function initIntro(): void {
   if (!overlay) return;
 
   lockScroll(true);
-  if (!reduceMotion) entrance(overlay);
+  const animated = !reduceMotion && getCore() !== null;
+  if (animated) entrance(overlay);
 
   let opened = false;
   const open = (): void => {
     if (opened) return;
     opened = true;
     unbind();
-    if (reduceMotion) finish(overlay, true);
-    else openSequence(overlay, () => finish(overlay, false));
+    if (animated) openSequence(overlay, () => finish(overlay, false));
+    else finish(overlay, true);
   };
   const unbind = bindOpeners(overlay, open);
 }

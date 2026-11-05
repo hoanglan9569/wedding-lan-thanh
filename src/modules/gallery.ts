@@ -1,6 +1,7 @@
 import { album } from '../data/wedding';
 import rawImages from '../data/images.json';
-import { gsap, reduceMotion } from './scroll';
+import { reduceMotion } from './scroll';
+import * as anim from '../vendor/motion-core/anim';
 
 interface ImageMeta {
   width: number;
@@ -43,7 +44,7 @@ function photoFigure(slug: string, alt: string, caption: string, index: number):
   const img = fig.querySelector('img');
   img?.addEventListener('load', () => {
     fig.style.backgroundImage = 'none';
-    if (!reduceMotion) gsap.fromTo(img, { opacity: 0.2 }, { opacity: 1, duration: 0.7 });
+    if (!reduceMotion) anim.fromTo(img, { opacity: 0.2 }, { opacity: 1 }, { duration: 0.7 });
   });
   return fig;
 }
@@ -129,10 +130,12 @@ class Lightbox {
     this.img.alt = item.alt;
     if (this.cap) this.cap.textContent = item.caption;
     if (reduceMotion) return;
-    gsap.fromTo(
+    anim.kill(this.img);
+    anim.fromTo(
       this.img,
       { opacity: 0, x: delta * 28, scale: 0.985 },
-      { opacity: 1, x: 0, scale: 1, duration: 0.5, ease: 'power3.out' },
+      { opacity: 1, x: 0, scale: 1 },
+      { duration: 0.5, ease: 'out3' },
     );
   }
 }

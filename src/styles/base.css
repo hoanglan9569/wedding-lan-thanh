@@ -263,9 +263,28 @@ html.no-motion [data-split] {
   overflow: hidden;
 }
 
-.split-word {
+.split-word,
+.split-char {
   display: inline-block;
   white-space: pre;
+}
+
+/* Phóng ảnh hero rất chậm: để CSS lo, không tốn khung JS nào */
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+.hero__media img {
+  animation: hero-kenburns 20s linear infinite alternate;
+}
+
+html.no-motion .hero__media img {
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

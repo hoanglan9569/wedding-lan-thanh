@@ -1,5 +1,5 @@
 import { music } from '../data/wedding';
-import { gsap } from './scroll';
+import * as anim from '../vendor/motion-core/anim';
 import { asset } from './gallery';
 
 const KEY = 'lanthanh:music';
@@ -19,13 +19,14 @@ function setPressed(on: boolean): void {
 
 function fadeTo(target: number, duration = 1.4): void {
   if (!audio) return;
-  gsap.to(audio, { volume: target, duration, ease: 'sine.out' });
+  anim.kill(audio);
+  anim.to(audio, { volume: target }, { duration, ease: 'outSine' });
 }
 
 export async function startMusic(): Promise<void> {
   if (!audio) return;
   try {
-    audio.volume = 0;
+    anim.set(audio, { volume: 0 });
     await audio.play();
     fadeTo(music.volume, 2.2);
     setPressed(true);
@@ -47,7 +48,7 @@ export function initMusic(): void {
   audio = new Audio(asset(music.src));
   audio.loop = true;
   audio.preload = 'none';
-  audio.volume = 0;
+  anim.set(audio, { volume: 0 });
   audio.title = music.title;
 
   button?.addEventListener('click', () => {

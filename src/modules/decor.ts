@@ -1,6 +1,8 @@
-import { gsap, ScrollTrigger, reduceMotion } from './scroll';
+/** Đường kẻ chương trình vẽ dần theo cuộn, và các nét hoa sen bung ra. */
+import * as anim from '../vendor/motion-core/anim';
+import { reduceMotion } from './scroll';
+import { addTrack } from './tracks';
 
-/** Đường kẻ dọc của phần chương trình được vẽ dần theo thao tác cuộn. */
 export function initTimelineLine(): void {
   const list = document.querySelector<HTMLElement>('#timeline');
   if (!list) return;
@@ -9,12 +11,20 @@ export function initTimelineLine(): void {
     return;
   }
   list.style.setProperty('--tl-progress', '0');
-  ScrollTrigger.create({
-    trigger: list,
-    start: 'top 80%',
-    end: 'bottom 72%',
+  let last = '0';
+  addTrack({
+    el: list,
+    start: (top, _height, vh) => top - vh * 0.8,
+    end: (top, height, vh) => top + height - vh * 0.72,
+    from: 0,
+    to: 1,
     scrub: 0.5,
-    onUpdate: (self) => list.style.setProperty('--tl-progress', self.progress.toFixed(3)),
+    apply: (v) => {
+      const next = v.toFixed(3);
+      if (next === last) return;
+      last = next;
+      list.style.setProperty('--tl-progress', next);
+    },
   });
 }
 
@@ -23,12 +33,15 @@ export function initOrnaments(): void {
   if (reduceMotion) return;
   const marks = document.querySelectorAll<HTMLElement>('.card__divider, .pair__amp, .footer__mark');
   marks.forEach((el) => {
-    gsap.from(el, {
-      opacity: 0,
-      scale: 0.55,
-      duration: 1.2,
-      ease: 'back.out(1.7)',
-      scrollTrigger: { trigger: el, start: 'top 92%', once: true },
-    });
+    anim.set(el, { opacity: 0, scale: 0.55 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        io.disconnect();
+        anim.fromTo(el, { opacity: 0, scale: 0.55 }, { opacity: 1, scale: 1 }, { duration: 1.2, ease: 'back' });
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0 },
+    );
+    io.observe(el);
   });
 }

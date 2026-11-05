@@ -7,7 +7,9 @@ import './styles/sections-couple.css';
 import './styles/sections-info.css';
 import './styles/ornaments.css';
 
-import { initSmoothScroll, initReveals, initAnchors, lockScroll, refreshScroll } from './modules/scroll';
+import { loadCore } from './vendor/motion-core/core';
+import { initSmoothScroll, initAnchors, lockScroll, refreshScroll } from './modules/scroll';
+import { initReveals } from './modules/reveal';
 import { initHero, initTopbar, initCardTilt } from './modules/hero';
 import { initPetals } from './modules/petals';
 import { initCountdown } from './modules/countdown';
@@ -47,8 +49,16 @@ function boot(): void {
   window.addEventListener('load', () => refreshScroll(), { once: true });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot, { once: true });
-} else {
+/** Lõi wasm nạp trước mọi thứ: hoạt hình chỉ bật khi chắc chắn có lõi. */
+async function start(): Promise<void> {
+  const disabled = new URLSearchParams(location.search).get('engine') === 'js';
+  const core = await loadCore({ disabled });
+  document.documentElement.dataset.engine = core ? 'wasm' : 'none';
   boot();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => void start(), { once: true });
+} else {
+  void start();
 }

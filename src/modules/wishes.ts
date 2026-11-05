@@ -1,4 +1,5 @@
-import { gsap, reduceMotion, refreshScroll } from './scroll';
+import { reduceMotion, refreshScroll } from './scroll';
+import * as anim from '../vendor/motion-core/anim';
 
 interface WishItem {
   id: string;
@@ -38,7 +39,11 @@ export function initWishes(): void {
       grid.replaceChildren(...withText.map(wishCard));
       if (empty) empty.hidden = withText.length > 0;
       if (!reduceMotion && withText.length > 0) {
-        gsap.from(grid.children, { opacity: 0, y: 20, duration: 0.7, stagger: 0.06, ease: 'power3.out' });
+        Array.from(grid.children).forEach((child, i) => {
+          if (child instanceof HTMLElement) {
+            anim.fromTo(child, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: 0.7, delay: i * 0.06 });
+          }
+        });
       }
       refreshScroll();
     })

@@ -1,7 +1,7 @@
 # Wedding Lan Thanh: Agent Guidelines
 
 ## Overview and Deployment
-This repository contains the online wedding invitation for Hoang Lan and Tran Kim Thanh (29.11.2026). The site is a single-page application built with Vite 8, TypeScript 7, GSAP 3.15, and self-hosted fonts. It supports Vietnamese typography exclusively, enforces a light-theme aesthetic, and is optimized for mobile responsiveness.
+This repository contains the online wedding invitation for Hoang Lan and Tran Kim Thanh (29.11.2026). The site is a single-page application built with Vite 8, TypeScript 7, self-hosted fonts, and the WebAssembly motion core (no GSAP, no Lenis: both were removed on 2026-11-05). It supports Vietnamese typography exclusively, enforces a light-theme aesthetic, and is optimized for mobile responsiveness.
 - Public site: https://lanthanh.pages.dev (Cloudflare Pages project "lanthanh").
 - Guest link generator: https://lanthanh.pages.dev/moi.html (accepts ?to=, ?guest=, ?khach=, ?name=).
 - Guest book moderation portal: https://lanthanh.pages.dev/admin.html.
@@ -16,6 +16,8 @@ Run all repository commands with Bun:
 - bun run optimize: Process raw high-resolution photography into multi-size WebP images and LQIP placeholders.
 - bun run optimize:art: Downscale transparent watercolor assets from assets-src/art/ to display sizes in public/art/.
 - bun run shots: Execute Playwright visual regression, layout measurements, and diacritic audits.
+- bun run sync:core: Copy the built WebAssembly core from ../wasm-motion-core/runtime into src/vendor/motion-core (run it after every change in that repo; the vendored files are committed).
+- bun run perf <oldUrl> <newUrl>: Compare two builds with Chrome CDP metrics (transfer bytes, script, layout, style, task time).
 - bun run deploy: Build the site and deploy dist/ to Cloudflare Pages via Wrangler.
 - bun run rsvp:list: List stored RSVP submission keys from Cloudflare KV.
 - bun run rsvp:deploy: Deploy Cloudflare Worker script and configuration from worker/.
@@ -24,6 +26,13 @@ Run all repository commands with Bun:
 - Fixed copy: index.html contains static Vietnamese copy, invitations, ceremony times, and footer text.
 - Dynamic data: src/data/wedding.ts holds structured data, couple details, addresses, photo lists, schedule entries, and music paths.
 - Design tokens: src/styles/base.css defines CSS variables in :root (color palettes, spacing, typography scales, shadows).
+
+## Animation Architecture
+- Every animated number is computed in WebAssembly: tweens, scroll tracks and scrub damping, smooth scroll, card tilt damping, the countdown split, and the petal rain (which returns ready canvas matrices in device pixels).
+- Source of truth: repos/wasm-motion-core (Rust crate plus TypeScript runtime). Never edit src/vendor/motion-core by hand; change it there, run bun run build in that repo, then bun run sync:core here.
+- src/modules/anim-facing code: reveal.ts (reveals and the character splitter), tracks.ts (scroll-driven values), scroll.ts (wheel-driven smooth scroll, locking, anchors), hero.ts, intro.ts, decor.ts, countdown.ts, petals.ts.
+- Animations only start after loadCore resolves in src/main.ts. With no core the page adds html.no-motion and shows everything: initial hidden states must never come from CSS alone.
+- Slow hero zoom (ken burns) is a CSS keyframe animation, not a tween: it would otherwise keep the frame loop awake forever.
 
 ## Architecture and Style Constraints
 - File length limit: Every stylesheet must stay strictly under 500 lines of code. Split stylesheets into modular files before reaching this threshold (for example sections.css, sections-couple.css, sections-info.css).
@@ -50,6 +59,8 @@ Before submitting changes, run bun run preview on port 4173 and execute bun scri
 - Clip-path flap requires distinct tone: An envelope flap created with clip-path that shares the identical background color of the envelope body appears stationary during opening animations. The flap shape must use a distinct shading tone.
 - Cormorant Garamond diacritic loss: Cormorant Garamond drops the acute mark over the letter ê in Vietnamese (causing ế to render erroneously as ê). Headings and display serif text must use Playfair Display.
 - Serif digit 1 confusion: High-display serif numbers resemble letters (specifically, digit 1 reads as capital I, turning 29 . 11 . 2026 into 29 . II . 2026). Dates, times, countdowns, and schedule numbers must always be styled with Be Vietnam Pro.
-- Lenis smooth scrolling limitations: Lenis is restricted to desktop pointer devices and must remain disabled on mobile devices. Because Lenis overrides programmatic window.scrollTo calls, automated warm-up scripts must dispatch synthetic wheel events.
+- Smooth scrolling limitations: smooth scroll is wheel-driven and desktop-only (disabled for coarse pointers and reduced motion). It overrides programmatic window.scrollTo, so automated warm-up scripts must dispatch synthetic wheel events and call window.__scroll.disable() before stitched screenshots.
+- Sealed WebAssembly exports: an instance's exports object is sealed, so Object.assign onto it throws in strict mode and the core silently falls back to no animation. Copy onto a fresh object, and check document.documentElement.dataset.engine === 'wasm' after any core change: the QA gate passes either way.
+- Redundant style writes: writing the same transform or opacity string again still costs a style recalculation. The runtime compares before writing; keep that when adding properties.
 - Edge cache on guest wishes: GET /wishes returns cache-control: max-age=30 at the Cloudflare edge. Approvals submitted via /admin.html take up to 30 seconds to reflect on the public wall unless cache-busting queries are used.
 - Deferred ornament loading: High-resolution watercolor decorations in src/styles/ornaments.css must only load after envelope opening (scoped under html.is-open) to maintain initial payload transfer under 630 KB.

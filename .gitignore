@@ -12,3 +12,7 @@ assets-src/originals/
 
 # Local wrangler dev state (miniflare KV, cache): never committed.
 worker/.wrangler/
+
+# Rust build output. The compiled src/wasm/petals-core.wasm IS committed so a
+# deploy never needs the Rust toolchain.
+wasm/petals-core/target/

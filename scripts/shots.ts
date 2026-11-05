@@ -73,7 +73,7 @@ async function openCard(page: Page): Promise<void> {
 
 /** Cuộn hết trang một lượt để mọi hiệu ứng xuất hiện đã chạy xong. */
 async function warmUp(page: Page): Promise<void> {
-  // Lăn chuột thật (Lenis chỉ nhận wheel) và cả scrollTo cho ngữ cảnh cảm ứng.
+  // Lăn chuột thật (cuộn mượt chỉ nhận wheel) và cả scrollTo cho ngữ cảnh cảm ứng.
   // Trang cao dần khi ảnh tải xong nên phải đo lại mỗi vòng, không tính trước.
   for (let step = 0; step < 80; step += 1) {
     const atBottom = await page.evaluate((delta) => {
@@ -225,7 +225,7 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   const marks = await diacritics(page);
   checks.push(`dấu tiếng Việt: ${marks.length ? marks.join(' | ') : 'đủ dấu'}`);
   // Tắt cuộn mượt: nó giành quyền cuộn với trình chụp nên ảnh ghép bị lệch.
-  await page.evaluate(() => (window as unknown as { __lenis?: { destroy(): void } }).__lenis?.destroy());
+  await page.evaluate(() => (window as unknown as { __scroll?: { disable(): void } }).__scroll?.disable());
   await page.waitForTimeout(300);
   const shots = await shootSections(page, view);
 

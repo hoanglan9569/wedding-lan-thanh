@@ -1,44 +1,34 @@
 import { weddingDate } from '../data/wedding';
-import { gsap, reduceMotion } from './scroll';
+import * as anim from '../vendor/motion-core/anim';
+import { getCore } from '../vendor/motion-core/core';
+import { reduceMotion } from './scroll';
 
 type Unit = 'days' | 'hours' | 'minutes' | 'seconds';
 
 const UNITS: Unit[] = ['days', 'hours', 'minutes', 'seconds'];
 
-function parts(ms: number): Record<Unit, string> {
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const days = Math.floor(total / 86400);
-  const hours = Math.floor((total % 86400) / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-  return {
-    days: String(days).padStart(2, '0'),
-    hours: String(hours).padStart(2, '0'),
-    minutes: String(minutes).padStart(2, '0'),
-    seconds: String(seconds).padStart(2, '0'),
-  };
+function pad(value: number): string {
+  return value < 10 ? `0${Math.max(0, value)}` : String(value);
 }
 
+/** Lật số: không bao giờ để opacity về 0 nên chữ số luôn đọc được. */
 function flip(el: HTMLElement, value: string): void {
   if (el.textContent === value) return;
-  if (reduceMotion) {
+  if (reduceMotion || !getCore()) {
     el.textContent = value;
     return;
   }
-  // Không bao giờ để opacity về 0: chữ số luôn đọc được, kể cả ngay lúc lật
-  gsap.timeline()
-    .to(el, { yPercent: -26, opacity: 0.28, duration: 0.13, ease: 'power2.in' })
-    .add(() => {
+  anim.fromTo(el, { yPercent: 0, opacity: 1 }, { yPercent: -26, opacity: 0.28 }, {
+    duration: 0.13,
+    ease: 'in2',
+    onComplete: () => {
       el.textContent = value;
-    })
-    .fromTo(
-      el,
-      { yPercent: 26, opacity: 0.28 },
-      { yPercent: 0, opacity: 1, duration: 0.27, ease: 'power3.out' },
-    );
+      anim.fromTo(el, { yPercent: 26, opacity: 0.28 }, { yPercent: 0, opacity: 1 }, { duration: 0.27, ease: 'out3' });
+    },
+  });
 }
 
-/** Đếm ngược tới giờ tiệc 11:00 ngày 29.11.2026 (GMT+7). */
+/** Đếm ngược tới giờ tiệc 11:00 ngày 29.11.2026 (GMT+7); phép chia do wasm làm. */
 export function initCountdown(): void {
   const grid = document.querySelector<HTMLElement>('#countdown-grid');
   const done = document.querySelector<HTMLElement>('#countdown-done');
@@ -54,8 +44,25 @@ export function initCountdown(): void {
 
   const tick = (): void => {
     const left = target - Date.now();
-    const value = parts(left);
-    for (const [unit, el] of cells) flip(el, value[unit]);
+    const core = getCore();
+    const total = Math.max(0, Math.floor(left / 1000));
+    let parts: number[];
+    if (core) {
+      core.countdown(total);
+      const base = core.motionCountdown;
+      parts = [
+        core.motionOut[base]!,
+        core.motionOut[base + 1]!,
+        core.motionOut[base + 2]!,
+        core.motionOut[base + 3]!,
+      ];
+    } else {
+      parts = [Math.floor(total / 86400), Math.floor((total % 86400) / 3600), Math.floor((total % 3600) / 60), total % 60];
+    }
+    UNITS.forEach((unit, i) => {
+      const el = cells.get(unit);
+      if (el) flip(el, pad(parts[i]!));
+    });
     if (left <= 0 && done) {
       done.hidden = false;
       grid.style.opacity = '0.45';

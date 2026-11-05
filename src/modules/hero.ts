@@ -1,48 +1,49 @@
-import { gsap, ScrollTrigger, reduceMotion } from './scroll';
+/**
+ * Hero: parallax theo cuộn (lõi wasm giữ dải cuộn và độ trễ), chữ bay vào khi
+ * mở thiệp, và thiệp nghiêng theo chuột với bộ giảm chấn trong wasm.
+ * Hiệu ứng phóng ảnh chậm (ken burns) để CSS lo: không tốn khung JS nào.
+ */
+import * as anim from '../vendor/motion-core/anim';
+import { getCore } from '../vendor/motion-core/core';
+import { onFrame, wake } from '../vendor/motion-core/anim';
+import { reduceMotion, isCoarse } from './scroll';
+import { addTrack } from './tracks';
 
-/** Ken burns + parallax cho ảnh hero, chạy được cả trên điện thoại. */
 export function initHero(): void {
   const media = document.querySelector<HTMLElement>('.hero__media');
-  const image = media?.querySelector('img');
   const hero = document.querySelector<HTMLElement>('.hero');
   if (!media || !hero || reduceMotion) return;
 
-  if (image) {
-    gsap.to(image, {
-      scale: 1.1,
-      duration: 20,
-      ease: 'none',
-      repeat: -1,
-      yoyo: true,
-    });
-  }
-
-  gsap.to(media, {
-    yPercent: 14,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: hero,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: 0.6,
-      invalidateOnRefresh: true,
-    },
+  addTrack({
+    el: hero,
+    start: (top) => top,
+    end: (top, height) => top + height,
+    from: 0,
+    to: 14,
+    scrub: 0.6,
+    apply: (v) => anim.set(media, { yPercent: v }),
   });
 
   const inner = hero.querySelector<HTMLElement>('.hero__inner');
-  if (inner) {
-    gsap.to(inner, {
-      yPercent: -8,
-      opacity: 0.1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: hero,
-        start: '40% top',
-        end: 'bottom top',
-        scrub: 0.4,
-      },
-    });
-  }
+  if (!inner) return;
+  addTrack({
+    el: hero,
+    start: (top, height) => top + height * 0.4,
+    end: (top, height) => top + height,
+    from: 0,
+    to: -8,
+    scrub: 0.4,
+    apply: (v) => anim.set(inner, { yPercent: v }),
+  });
+  addTrack({
+    el: hero,
+    start: (top, height) => top + height * 0.4,
+    end: (top, height) => top + height,
+    from: 1,
+    to: 0.1,
+    scrub: 0.4,
+    apply: (v) => anim.set(inner, { opacity: v }),
+  });
 }
 
 /** Thanh điều hướng hiện ra sau khi rời hero. */
@@ -50,12 +51,11 @@ export function initTopbar(): void {
   const bar = document.querySelector<HTMLElement>('#topbar');
   const hero = document.querySelector<HTMLElement>('.hero');
   if (!bar || !hero) return;
-  ScrollTrigger.create({
-    trigger: hero,
-    start: 'bottom 72%',
-    onEnter: () => bar.classList.add('topbar--on'),
-    onLeaveBack: () => bar.classList.remove('topbar--on'),
-  });
+  const io = new IntersectionObserver(
+    ([entry]) => bar.classList.toggle('topbar--on', !(entry?.isIntersecting ?? true)),
+    { rootMargin: '-72% 0px 0px 0px', threshold: 0 },
+  );
+  io.observe(hero);
 }
 
 /** Mở màn sau khi bấm "Mở thiệp": tên và ngày bay vào. */
@@ -64,37 +64,47 @@ export function playHeroIntro(): void {
   const names = document.querySelectorAll<HTMLElement>('.hero__name, .hero__amp');
   const line = document.querySelector<HTMLElement>('.hero__dateline');
   const eyebrow = document.querySelector<HTMLElement>('.hero__eyebrow');
-  const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-  if (eyebrow) tl.from(eyebrow, { opacity: 0, y: 18, duration: 0.9 }, 0);
-  tl.from(names, { opacity: 0, y: 60, duration: 1.3, stagger: 0.12 }, 0.1);
-  if (line) tl.from(line, { opacity: 0, y: 26, duration: 1 }, 0.55);
+  if (eyebrow) anim.fromTo(eyebrow, { opacity: 0, y: 18 }, { opacity: 1, y: 0 }, { duration: 0.9, ease: 'out4' });
+  names.forEach((el, i) => {
+    anim.fromTo(el, { opacity: 0, y: 60 }, { opacity: 1, y: 0 }, { duration: 1.3, delay: 0.1 + i * 0.12, ease: 'out4' });
+  });
+  if (line) {
+    anim.fromTo(line, { opacity: 0, y: 26 }, { opacity: 1, y: 0 }, { duration: 1, delay: 0.55, ease: 'out4' });
+  }
 }
 
 /** Hiệu ứng nghiêng nhẹ cho tấm thiệp khi rê chuột (bỏ qua trên cảm ứng). */
 export function initCardTilt(): void {
   const card = document.querySelector<HTMLElement>('.card3d__inner');
-  if (!card || reduceMotion || window.matchMedia('(pointer: coarse)').matches) return;
+  const core = getCore();
+  if (!card || !core || reduceMotion || isCoarse) return;
   const parent = card.parentElement;
   if (!parent) return;
 
-  const move = (event: PointerEvent): void => {
+  let busy = false;
+  anim.set(card, { perspective: 1400 });
+  onFrame((_now, dt) => {
+    if (!busy) return false;
+    busy = core.tilt_tick(dt) === 1;
+    anim.set(card, {
+      rotateY: core.motionOut[core.motionTiltX]!,
+      rotateX: core.motionOut[core.motionTiltX + 1]!,
+    });
+    return busy;
+  });
+
+  parent.addEventListener('pointermove', (event) => {
     const rect = parent.getBoundingClientRect();
     const px = (event.clientX - rect.left) / rect.width - 0.5;
     const py = (event.clientY - rect.top) / rect.height - 0.5;
-    gsap.to(card, {
-      rotateY: px * 6,
-      rotateX: -py * 5,
-      transformPerspective: 1400,
-      transformOrigin: 'center',
-      duration: 0.7,
-      ease: 'power2.out',
-    });
-  };
+    core.tilt_target(px * 6, -py * 5, 0.12);
+    busy = true;
+    wake();
+  });
 
-  const reset = (): void => {
-    gsap.to(card, { rotateX: 0, rotateY: 0, duration: 1, ease: 'power3.out' });
-  };
-
-  parent.addEventListener('pointermove', move);
-  parent.addEventListener('pointerleave', reset);
+  parent.addEventListener('pointerleave', () => {
+    core.tilt_target(0, 0, 0.22);
+    busy = true;
+    wake();
+  });
 }
