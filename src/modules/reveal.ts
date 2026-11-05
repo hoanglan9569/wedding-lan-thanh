@@ -52,21 +52,23 @@ function targetsOf(el: HTMLElement, kind: Kind): HTMLElement[] {
   return kids.length ? kids : [el];
 }
 
-function setupReveal(el: HTMLElement): void {
+/** Ẩn ngay, trả về hàm bật hiệu ứng (gắn IntersectionObserver) để gọi sau. */
+function setupReveal(el: HTMLElement): () => void {
   const kind = (el.dataset.reveal || 'fade') as Kind;
   const recipe = RECIPES[kind] ?? RECIPES.fade;
   const targets = targetsOf(el, kind);
   const to = naturalOf(recipe.from);
   for (const target of targets) anim.set(target, recipe.from);
-  onFirstSight(el, () => {
-    targets.forEach((target, i) => {
-      anim.fromTo(target, recipe.from, to, {
-        duration: recipe.duration,
-        delay: (recipe.stagger ?? 0) * i,
-        ease: 'out3',
+  return () =>
+    onFirstSight(el, () => {
+      targets.forEach((target, i) => {
+        anim.fromTo(target, recipe.from, to, {
+          duration: recipe.duration,
+          delay: (recipe.stagger ?? 0) * i,
+          ease: 'out3',
+        });
       });
     });
-  });
 }
 
 /** Tách từng chữ cái thành span, giữ nguyên khoảng trắng và dấu tiếng Việt. */
@@ -84,35 +86,45 @@ function splitChars(el: HTMLElement): HTMLElement[] {
   return chars;
 }
 
-function setupSplit(el: HTMLElement): void {
+function setupSplit(el: HTMLElement): () => void {
   const chars = splitChars(el);
   const from: anim.Props = { yPercent: 118, opacity: 0 };
   const to: anim.Props = { yPercent: 0, opacity: 1 };
   for (const char of chars) anim.set(char, from);
-  onFirstSight(el, () => {
-    chars.forEach((char, i) => {
-      anim.fromTo(char, from, to, { duration: 1.15, delay: 0.035 * i, ease: 'out4' });
+  return () =>
+    onFirstSight(el, () => {
+      chars.forEach((char, i) => {
+        anim.fromTo(char, from, to, { duration: 1.15, delay: 0.035 * i, ease: 'out4' });
+      });
     });
-  });
+}
+
+const armers = { hero: [] as (() => void)[], rest: [] as (() => void)[] };
+
+/**
+ * Ẩn mọi phần tử có hiệu ứng ngay khi trang dựng, kể cả khi khách F5 giữa
+ * trang: nếu đợi tới lúc mở thiệp mới ẩn thì trang hiện sẵn toàn bộ.
+ * Trả về false khi không có lõi: lúc đó trang để nguyên, hiện đủ nội dung.
+ */
+export function prepareReveals(): boolean {
+  if (reduceMotion || !getCore()) {
+    document.documentElement.classList.add('no-motion');
+    return false;
+  }
+  const inHero = (el: HTMLElement): boolean => el.closest('.hero') !== null;
+  const add = (el: HTMLElement, arm: () => void): void => {
+    armers[inHero(el) ? 'hero' : 'rest'].push(arm);
+  };
+  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => add(el, setupReveal(el)));
+  document.querySelectorAll<HTMLElement>('[data-split]').forEach((el) => add(el, setupSplit(el)));
+  return true;
 }
 
 /**
- * `hero`: phần nằm dưới phong bì, dựng ngay (mở thiệp xong là chữ bay vào).
- * `rest`: phần còn lại, chỉ dựng sau khi thiệp mở, nếu không thì chúng đã chạy
- * xong sau lớp phủ và khách cuộn xuống thấy trang đứng im.
+ * Bật hiệu ứng: `hero` ngay từ đầu, `rest` chỉ sau khi thiệp mở, nếu không
+ * chúng chạy hết sau lớp phủ và khách cuộn xuống thấy trang đứng im.
  */
-export function initReveals(scope: 'hero' | 'rest' | 'all' = 'all'): void {
-  if (reduceMotion || !getCore()) {
-    document.documentElement.classList.add('no-motion');
-    return;
-  }
-  const inHero = (el: HTMLElement): boolean => el.closest('.hero') !== null;
-  const wanted = (el: HTMLElement): boolean =>
-    scope === 'all' || (scope === 'hero' ? inHero(el) : !inHero(el));
-  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
-    if (wanted(el)) setupReveal(el);
-  });
-  document.querySelectorAll<HTMLElement>('[data-split]').forEach((el) => {
-    if (wanted(el)) setupSplit(el);
-  });
+export function armReveals(scope: 'hero' | 'rest'): void {
+  for (const arm of armers[scope]) arm();
+  armers[scope] = [];
 }
