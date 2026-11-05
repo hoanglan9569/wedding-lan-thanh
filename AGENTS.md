@@ -1,42 +1,42 @@
 # Wedding Lan Thanh: Agent Guidelines
 
 ## Overview and Deployment
-This repository contains the online wedding invitation for Hoang Lan and Tran Kim Thanh (29.11.2026). The site is a single-page application built with Vite 8, TypeScript 7, self-hosted fonts, and the WebAssembly motion core (no GSAP, no Lenis: both were removed on 2026-11-05). It supports Vietnamese typography exclusively, enforces a light-theme aesthetic, and is optimized for mobile responsiveness.
-- Public site: https://lanthanh.pages.dev (Cloudflare Pages project "lanthanh").
-- Guest link generator: https://lanthanh.pages.dev/moi.html (accepts ?to=, ?guest=, ?khach=, ?name=).
-- Guest book moderation portal: https://lanthanh.pages.dev/admin.html.
-- Backend API: https://lanthanh-rsvp.hoanglan9569.workers.dev (Cloudflare Worker "lanthanh-rsvp" with Cloudflare KV).
+Single-page online wedding invitation for Hoang Lan & Tran Kim Thanh (29.11.2026). Built with Vite 8, TypeScript 7, self-hosted fonts, and WebAssembly motion core (no GSAP, no Lenis: removed 2026-11-05). Light theme, Vietnamese typography only, mobile-optimized.
+- Public site: https://lanthanh.pages.dev (Cloudflare Pages "lanthanh").
+- Guest link generator: https://lanthanh.pages.dev/moi.html (?to=, ?guest=, ?khach=, ?name=).
+- Guest book admin: https://lanthanh.pages.dev/admin.html.
+- Backend API: https://lanthanh-rsvp.hoanglan9569.workers.dev (Worker "lanthanh-rsvp" with KV).
 
 ## Commands
 Run all repository commands with Bun:
-- bun run dev: Start the Vite local development server at http://127.0.0.1:5273.
-- bun run build: Compile TypeScript and build the production distribution into dist/.
-- bun run preview: Serve the built dist/ bundle locally at http://127.0.0.1:4173.
-- bun run typecheck: Validate TypeScript types without emitting files (tsc --noEmit).
-- bun run optimize: Process raw high-resolution photography into multi-size WebP images and LQIP placeholders.
-- bun run optimize:art: Downscale transparent watercolor assets from assets-src/art/ to display sizes in public/art/.
-- bun run shots: Execute Playwright visual regression, layout measurements, and diacritic audits.
-- bun run sync:core: Copy the built WebAssembly core from ../wasm-motion-core/runtime into src/vendor/motion-core (run it after every change in that repo; the vendored files are committed).
-- bun run perf <oldUrl> <newUrl>: Compare two builds with Chrome CDP metrics (transfer bytes, script, layout, style, task time).
-- bun run deploy: Build the site and deploy dist/ to Cloudflare Pages via Wrangler.
-- bun run rsvp:list: List stored RSVP submission keys from Cloudflare KV.
-- bun run rsvp:deploy: Deploy Cloudflare Worker script and configuration from worker/.
+- bun run dev: Vite dev server at http://127.0.0.1:5273.
+- bun run build: Compile TS and build production bundle into dist/.
+- bun run preview: Serve dist/ bundle locally at http://127.0.0.1:4173.
+- bun run typecheck: Validate types without emitting files (tsc --noEmit).
+- bun run optimize: Process photography into multi-size WebP and LQIP placeholders.
+- bun run optimize:art: Downscale watercolor assets from assets-src/art/ to public/art/.
+- bun run shots: Playwright visual regression, layout measurements, and diacritic audits.
+- bun run sync:core: Copy wasm core from ../wasm-motion-core/runtime into src/vendor/motion-core (run after core changes; vendored files are committed).
+- bun run perf <oldUrl> <newUrl>: Compare builds with Chrome CDP metrics.
+- bun run deploy: Build site and deploy dist/ to Cloudflare Pages via Wrangler.
+- bun run rsvp:list: List stored RSVP keys from Cloudflare KV.
+- bun run rsvp:deploy: Deploy Worker script and config from worker/.
 
 ## Content Locations
-- Fixed copy: index.html contains static Vietnamese copy, invitations, ceremony times, and footer text.
-- Dynamic data: src/data/wedding.ts holds structured data, couple details, addresses, photo lists, schedule entries, and music paths.
-- Design tokens: src/styles/base.css defines CSS variables in :root (color palettes, spacing, typography scales, shadows).
+- Fixed copy: index.html (static Vietnamese copy, invitations, ceremony times, footer).
+- Dynamic data: src/data/wedding.ts (couple details, addresses, photos, schedule, music).
+- Design tokens: src/styles/base.css (:root CSS variables for colors, spacing, typography).
 
 ## Animation Architecture
-- Every animated number is computed in WebAssembly: tweens, scroll tracks and scrub damping, smooth scroll, card tilt damping, the countdown split, and the petal rain (which returns ready canvas matrices in device pixels).
-- Source of truth: repos/wasm-motion-core (Rust crate plus TypeScript runtime). Never edit src/vendor/motion-core by hand; change it there, run bun run build in that repo, then bun run sync:core here.
-- src/modules/anim-facing code: reveal.ts (reveals and the character splitter), tracks.ts (scroll-driven values), scroll.ts (wheel-driven smooth scroll, locking, anchors), hero.ts, intro.ts, decor.ts, countdown.ts, petals.ts.
-- Animations only start after loadCore resolves in src/main.ts. With no core the page adds html.no-motion and shows everything: initial hidden states must never come from CSS alone.
-- Slow hero zoom (ken burns) is a CSS keyframe animation, not a tween: it would otherwise keep the frame loop awake forever.
+- Animated values computed in WebAssembly: tweens, scroll tracks and scrub damping, smooth scroll, card tilt damping, countdown split, petal rain (ready canvas matrices in device pixels).
+- Source of truth: repos/wasm-motion-core (Rust crate + TS runtime). Never edit src/vendor/motion-core by hand; change upstream, build there, then bun run sync:core here.
+- Animation modules: reveal.ts (reveals, character splitter), tracks.ts (scroll-driven values), scroll.ts (wheel smooth scroll, lock, anchors), hero.ts, intro.ts, decor.ts, countdown.ts, petals.ts.
+- Animations start after loadCore resolves in src/main.ts. Without core, html.no-motion is added and shows everything; never hide initial states via CSS alone.
+- Ken Burns hero zoom is a CSS keyframe animation, not a tween (keeps frame loop idle).
 
-## Architecture and Style Constraints
-- File length limit: Every stylesheet must stay strictly under 500 lines of code. Split stylesheets into modular files before reaching this threshold (for example sections.css, sections-couple.css, sections-info.css).
-- Import cascade order: Stylesheet import order in src/main.ts is significant and must not be altered:
+## Constraints
+- Stylesheet limit: Every stylesheet must stay under 500 lines. Split before exceeding.
+- Import cascade order in src/main.ts is strict:
   1. src/styles/base.css
   2. src/styles/components.css
   3. src/styles/intro.css
@@ -47,20 +47,20 @@ Run all repository commands with Bun:
   8. src/styles/ornaments.css
 
 ## QA Gate
-Before submitting changes, run bun run preview on port 4173 and execute bun scripts/shots.ts. The test suite must pass with all criteria satisfied:
-- Horizontal overflow: Must report exactly 0 px overflow across both desktop (1440x900) and mobile (iPhone 13).
-- Console errors: Zero console errors and zero uncaught page exceptions.
-- Reveal animation check: Zero elements remaining faded (opacity < 0.9) after page warm-up.
-- Contrast ratio: WCAG contrast ratio for all text elements must measure at or above 6:1 against computed background colors.
-- Diacritic verification: Canvas ascent and descent measurements must output "đủ dấu" across Playfair Display, Be Vietnam Pro, and Dancing Script for stacked tone marks (ế, ồ, ữ, ỗ) and sub-base marks (ặ, ọ).
+Run bun run preview on port 4173 and execute bun scripts/shots.ts before submitting. Criteria:
+- Overflow: Exactly 0 px horizontal overflow on desktop (1440x900) and mobile (iPhone 13).
+- Errors: Zero console errors and zero uncaught exceptions.
+- Reveals: Zero elements remaining faded (opacity < 0.9) after warm-up.
+- Contrast: WCAG contrast ratio >= 6:1 against computed background colors.
+- Diacritics: Canvas text metrics output "đủ dấu" across Playfair Display, Be Vietnam Pro, and Dancing Script for stacked (ế, ồ, ữ, ỗ) and sub-base marks (ặ, ọ).
 
 ## Pitfalls to Avoid
-- Filter flattens preserve-3d: Adding a CSS filter (such as drop-shadow or blur) to any container with transform-style: preserve-3d collapses the 3D rendering context. Place drop-shadow styling on nested pseudo-elements instead.
-- Clip-path flap requires distinct tone: An envelope flap created with clip-path that shares the identical background color of the envelope body appears stationary during opening animations. The flap shape must use a distinct shading tone.
-- Cormorant Garamond diacritic loss: Cormorant Garamond drops the acute mark over the letter ê in Vietnamese (causing ế to render erroneously as ê). Headings and display serif text must use Playfair Display.
-- Serif digit 1 confusion: High-display serif numbers resemble letters (specifically, digit 1 reads as capital I, turning 29 . 11 . 2026 into 29 . II . 2026). Dates, times, countdowns, and schedule numbers must always be styled with Be Vietnam Pro.
-- Smooth scrolling limitations: smooth scroll is wheel-driven and desktop-only (disabled for coarse pointers and reduced motion). It overrides programmatic window.scrollTo, so automated warm-up scripts must dispatch synthetic wheel events and call window.__scroll.disable() before stitched screenshots.
-- Sealed WebAssembly exports: an instance's exports object is sealed, so Object.assign onto it throws in strict mode and the core silently falls back to no animation. Copy onto a fresh object, and check document.documentElement.dataset.engine === 'wasm' after any core change: the QA gate passes either way.
-- Redundant style writes: writing the same transform or opacity string again still costs a style recalculation. The runtime compares before writing; keep that when adding properties.
-- Edge cache on guest wishes: GET /wishes returns cache-control: max-age=30 at the Cloudflare edge. Approvals submitted via /admin.html take up to 30 seconds to reflect on the public wall unless cache-busting queries are used.
-- Deferred ornament loading: High-resolution watercolor decorations in src/styles/ornaments.css must only load after envelope opening (scoped under html.is-open) to maintain initial payload transfer under 630 KB.
+- Filter flattens preserve-3d: CSS filters (drop-shadow, blur) on transform-style: preserve-3d collapse 3D context. Place drop-shadow on nested pseudo-elements.
+- Clip-path flap contrast: Envelope flap needs distinct shading from envelope body or opening animation appears stationary.
+- Cormorant Garamond diacritic loss: Drops acute over ê (ế renders as ê). Headings and display serif must use Playfair Display.
+- Serif digit 1 confusion: High-display serif digit 1 resembles capital I (29.11.2026 reads as 29.II.2026). Numbers, dates, countdowns must use Be Vietnam Pro.
+- Smooth scroll limitations: Wheel-driven and desktop-only (disabled for coarse pointers / reduced motion). Overrides window.scrollTo; warm-up scripts must dispatch synthetic wheel events and call window.__scroll.disable() before screenshot stitching.
+- Sealed WebAssembly exports: Instance exports are sealed; Object.assign throws in strict mode and animations silently fail. Copy to a fresh object and check document.documentElement.dataset.engine === 'wasm' after core changes (QA gate passes either way).
+- Redundant style writes: Re-writing identical transform/opacity strings still triggers style recalculation. Runtime compares before writing; preserve this when adding properties.
+- Wishes edge cache: GET /wishes is cached for 30s at Cloudflare edge. Admin approvals take up to 30s to appear publicly without cache-busting.
+- Deferred ornament loading: High-res watercolor assets in src/styles/ornaments.css must only load after opening (scoped under html.is-open) to keep initial transfer under 630 KB.
