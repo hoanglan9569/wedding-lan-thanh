@@ -64,3 +64,6 @@ Run bun run preview on port 4173 and execute bun scripts/shots.ts before submitt
 - Redundant style writes: Re-writing identical transform/opacity strings still triggers style recalculation. Runtime compares before writing; preserve this when adding properties.
 - Wishes edge cache: GET /wishes is cached for 30s at Cloudflare edge. Admin approvals take up to 30s to appear publicly without cache-busting.
 - Deferred ornament loading: High-res watercolor assets in src/styles/ornaments.css must only load after opening (scoped under html.is-open) to keep initial transfer under 630 KB.
+- Replaced element inset: `inset: 0` never stretches a replaced element (canvas/img/video/iframe); the petal canvas needs width/height 100% or it stays 300x150 and the JS sizes its buffer from the wrong box.
+- Time-sampled animation verification: verifying an animation by its end state proves nothing: sample the value over time (out/check-wedding.ts style probes).
+- Overlay reveal timing: an IntersectionObserver ignores a covering overlay, so reveals outside .hero are armed on the intro:done event, not at boot.
