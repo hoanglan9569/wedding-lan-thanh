@@ -46,7 +46,7 @@ Run bun run preview on port 4173 and execute bun scripts/shots.ts before submitt
 - Reveals: Zero elements remaining faded (opacity < 0.9) after warm-up.
 - Contrast: WCAG contrast ratio >= 6:1 against computed background colors.
 - Diacritics: Canvas text metrics output "đủ dấu" across Playfair Display, Be Vietnam Pro, and Dancing Script for stacked (ế, ồ, ữ, ỗ) and sub-base marks (ặ, ọ).
-- Motion: bun run check:motion passes on the preview, then on https://lanthanh.pages.dev after deploy. It samples envelope, petals, Ken Burns, reveals and a reload over time on Chromium desktop/phone and WebKit phone, reduced motion on, off and as the OS reports it.
+- Motion: bun run check:motion passes on the preview, then on https://lanthanh.pages.dev after deploy. Time-sampled envelope, petals, Ken Burns, reveals and reload; Chromium desktop/phone, WebKit phone; reduced motion on, off and as the OS reports it.
 
 ## Pitfalls to Avoid
 - Filter flattens preserve-3d: CSS filters (drop-shadow, blur) on transform-style: preserve-3d collapse 3D context. Place drop-shadow on nested pseudo-elements.
@@ -59,6 +59,6 @@ Run bun run preview on port 4173 and execute bun scripts/shots.ts before submitt
 - Wishes edge cache: GET /wishes is cached for 30s at Cloudflare edge. Admin approvals take up to 30s to appear publicly without cache-busting.
 - Deferred ornament loading: High-res watercolor assets in src/styles/ornaments.css must only load after opening (scoped under html.is-open) to keep initial transfer under 630 KB.
 - Replaced element inset: `inset: 0` never stretches a replaced element (canvas/img/video/iframe); the petal canvas needs width/height 100% or it stays 300x150 and the JS sizes its buffer from the wrong box.
-- OS reduced motion: the owner's PC reports prefers-reduced-motion: reduce (Windows Animation effects off) while Playwright emulates no-preference by default, so earlier probes saw motion he never saw. The site deliberately ignores the preference (comment in scroll.ts); probes of his view pass reducedMotion: null.
+- OS reduced motion: the owner's PC reports prefers-reduced-motion: reduce (Windows Animation effects off) while Playwright emulates no-preference by default, so earlier probes saw motion he never saw. The site ignores it on purpose (scroll.ts); probes of his view pass reducedMotion: null.
 - Restored scroll on refresh: keep history.scrollRestoration = 'manual' and the scroll to top while #intro exists, or the envelope fades onto an already-scrolled page.
 - Overlay reveal timing: reveals are hidden by prepareReveals() at boot and only armed later by armReveals('hero'|'rest'); never set the hidden state at arming time.
