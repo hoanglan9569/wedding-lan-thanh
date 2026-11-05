@@ -77,10 +77,12 @@ export function initPetals(canvas: HTMLCanvasElement): void {
   });
   wake();
 
-  window.addEventListener('resize', () => {
+  // hero đổi cỡ (mở thiệp, xoay máy, ảnh tải xong) thì dựng lại đàn cánh hoa
+  const ro = new ResizeObserver(() => {
     resize();
     wake();
   });
+  ro.observe(canvas);
 
   const io = new IntersectionObserver(
     ([entry]) => {

@@ -96,11 +96,23 @@ function setupSplit(el: HTMLElement): void {
   });
 }
 
-export function initReveals(): void {
+/**
+ * `hero`: phần nằm dưới phong bì, dựng ngay (mở thiệp xong là chữ bay vào).
+ * `rest`: phần còn lại, chỉ dựng sau khi thiệp mở, nếu không thì chúng đã chạy
+ * xong sau lớp phủ và khách cuộn xuống thấy trang đứng im.
+ */
+export function initReveals(scope: 'hero' | 'rest' | 'all' = 'all'): void {
   if (reduceMotion || !getCore()) {
     document.documentElement.classList.add('no-motion');
     return;
   }
-  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(setupReveal);
-  document.querySelectorAll<HTMLElement>('[data-split]').forEach(setupSplit);
+  const inHero = (el: HTMLElement): boolean => el.closest('.hero') !== null;
+  const wanted = (el: HTMLElement): boolean =>
+    scope === 'all' || (scope === 'hero' ? inHero(el) : !inHero(el));
+  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
+    if (wanted(el)) setupReveal(el);
+  });
+  document.querySelectorAll<HTMLElement>('[data-split]').forEach((el) => {
+    if (wanted(el)) setupSplit(el);
+  });
 }

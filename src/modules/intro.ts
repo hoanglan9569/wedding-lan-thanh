@@ -10,6 +10,8 @@ function finish(overlay: HTMLElement, playHero: boolean): void {
   overlay.remove();
   // tranh trang trí chỉ tải sau khi mở thiệp, để lần đầu vào trang thật nhẹ
   document.documentElement.classList.add('is-open');
+  // hiệu ứng cuộn của phần dưới chỉ dựng từ đây: trước đó chúng chạy sau lớp phủ
+  document.dispatchEvent(new CustomEvent('intro:done'));
   lockScroll(false);
   window.scrollTo(0, 0);
   refreshScroll();

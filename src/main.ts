@@ -37,9 +37,22 @@ function boot(): void {
   initTopbar();
   initCardTilt();
   initTimelineLine();
-  initOrnaments();
-  initReveals();
   initAnchors();
+
+  const overlay = document.querySelector('#intro');
+  initReveals(overlay ? 'hero' : 'all');
+  if (overlay) {
+    document.addEventListener(
+      'intro:done',
+      () => {
+        initReveals('rest');
+        initOrnaments();
+      },
+      { once: true },
+    );
+  } else {
+    initOrnaments();
+  }
 
   const canvas = document.querySelector<HTMLCanvasElement>('#petals');
   if (canvas) initPetals(canvas);
