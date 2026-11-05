@@ -1,4 +1,4 @@
-import { reduceMotion, refreshScroll } from './scroll';
+import { refreshScroll } from './scroll';
 import * as anim from '../vendor/motion-core/anim';
 
 interface WishItem {
@@ -38,7 +38,7 @@ export function initWishes(): void {
       const withText = Array.isArray(list) ? list.filter((r) => r && r.wish && r.wish.trim().length > 0) : [];
       grid.replaceChildren(...withText.map(wishCard));
       if (empty) empty.hidden = withText.length > 0;
-      if (!reduceMotion && withText.length > 0) {
+      if (withText.length > 0) {
         Array.from(grid.children).forEach((child, i) => {
           if (child instanceof HTMLElement) {
             anim.fromTo(child, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: 0.7, delay: i * 0.06 });

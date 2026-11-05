@@ -130,11 +130,9 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .is-open .countdown::before,
-  .is-open .footer::before {
-    animation: driftY 26s ease-in-out infinite alternate;
-  }
+.is-open .countdown::before,
+.is-open .footer::before {
+  animation: driftY 26s ease-in-out infinite alternate;
 }
 
 @keyframes driftY {

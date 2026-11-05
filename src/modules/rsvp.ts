@@ -1,5 +1,5 @@
 import { rsvp as rsvpConfig } from '../data/wedding';
-import { reduceMotion, refreshScroll } from './scroll';
+import { refreshScroll } from './scroll';
 import * as anim from '../vendor/motion-core/anim';
 
 const KEY = 'lanthanh:wishes';
@@ -51,7 +51,7 @@ export function renderWishes(list: Reply[]): void {
   const withText = list.filter((reply) => reply.wish.trim().length > 0);
   grid.replaceChildren(...withText.slice().reverse().map(wishCard));
   if (empty) empty.hidden = withText.length > 0;
-  if (!reduceMotion && withText.length) {
+  if (withText.length) {
     Array.from(grid.children).forEach((child, i) => {
       if (child instanceof HTMLElement) {
         anim.fromTo(child, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: 0.7, delay: i * 0.06 });
@@ -76,7 +76,6 @@ async function send(reply: Reply): Promise<boolean> {
 }
 
 function burst(origin: HTMLElement): void {
-  if (reduceMotion) return;
   const rect = origin.getBoundingClientRect();
   for (let i = 0; i < 14; i += 1) {
     const dot = document.createElement('span');

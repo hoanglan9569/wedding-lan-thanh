@@ -1,7 +1,6 @@
 import { weddingDate } from '../data/wedding';
 import * as anim from '../vendor/motion-core/anim';
 import { getCore } from '../vendor/motion-core/core';
-import { reduceMotion } from './scroll';
 
 type Unit = 'days' | 'hours' | 'minutes' | 'seconds';
 
@@ -14,7 +13,7 @@ function pad(value: number): string {
 /** Lật số: không bao giờ để opacity về 0 nên chữ số luôn đọc được. */
 function flip(el: HTMLElement, value: string): void {
   if (el.textContent === value) return;
-  if (reduceMotion || !getCore()) {
+  if (!getCore()) {
     el.textContent = value;
     return;
   }

@@ -1,6 +1,6 @@
 import * as anim from '../vendor/motion-core/anim';
 import { getCore } from '../vendor/motion-core/core';
-import { reduceMotion, lockScroll, refreshScroll } from './scroll';
+import { lockScroll, refreshScroll } from './scroll';
 import { playHeroIntro } from './hero';
 import { startMusic, musicWanted } from './music';
 
@@ -120,7 +120,7 @@ export function initIntro(): void {
   if (!overlay) return;
 
   lockScroll(true);
-  const animated = !reduceMotion && getCore() !== null;
+  const animated = getCore() !== null;
   if (animated) entrance(overlay);
 
   let opened = false;

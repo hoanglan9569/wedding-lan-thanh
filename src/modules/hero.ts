@@ -6,13 +6,13 @@
 import * as anim from '../vendor/motion-core/anim';
 import { getCore } from '../vendor/motion-core/core';
 import { onFrame, wake } from '../vendor/motion-core/anim';
-import { reduceMotion, isCoarse } from './scroll';
+import { isCoarse } from './scroll';
 import { addTrack } from './tracks';
 
 export function initHero(): void {
   const media = document.querySelector<HTMLElement>('.hero__media');
   const hero = document.querySelector<HTMLElement>('.hero');
-  if (!media || !hero || reduceMotion) return;
+  if (!media || !hero) return;
 
   addTrack({
     el: hero,
@@ -60,7 +60,6 @@ export function initTopbar(): void {
 
 /** Mở màn sau khi bấm "Mở thiệp": tên và ngày bay vào. */
 export function playHeroIntro(): void {
-  if (reduceMotion) return;
   const names = document.querySelectorAll<HTMLElement>('.hero__name, .hero__amp');
   const line = document.querySelector<HTMLElement>('.hero__dateline');
   const eyebrow = document.querySelector<HTMLElement>('.hero__eyebrow');
@@ -77,7 +76,7 @@ export function playHeroIntro(): void {
 export function initCardTilt(): void {
   const card = document.querySelector<HTMLElement>('.card3d__inner');
   const core = getCore();
-  if (!card || !core || reduceMotion || isCoarse) return;
+  if (!card || !core || isCoarse) return;
   const parent = card.parentElement;
   if (!parent) return;
 

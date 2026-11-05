@@ -1,12 +1,13 @@
 /** Đường kẻ chương trình vẽ dần theo cuộn, và các nét hoa sen bung ra. */
 import * as anim from '../vendor/motion-core/anim';
-import { reduceMotion } from './scroll';
+import { getCore } from '../vendor/motion-core/core';
 import { addTrack } from './tracks';
 
 export function initTimelineLine(): void {
   const list = document.querySelector<HTMLElement>('#timeline');
   if (!list) return;
-  if (reduceMotion) {
+  // without the core no track ever ticks, so the line is drawn in full up front
+  if (!getCore()) {
     list.style.setProperty('--tl-progress', '1');
     return;
   }
@@ -30,7 +31,7 @@ export function initTimelineLine(): void {
 
 /** Các nét hoa sen bung ra khi trôi vào khung nhìn. */
 export function initOrnaments(): void {
-  if (reduceMotion) return;
+  if (!getCore()) return;
   const marks = document.querySelectorAll<HTMLElement>('.card__divider, .pair__amp, .footer__mark');
   marks.forEach((el) => {
     anim.set(el, { opacity: 0, scale: 0.55 });

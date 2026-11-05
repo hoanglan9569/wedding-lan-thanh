@@ -4,7 +4,6 @@
  */
 import * as anim from '../vendor/motion-core/anim';
 import { getCore } from '../vendor/motion-core/core';
-import { reduceMotion } from './scroll';
 
 type Kind = 'fade' | 'rise' | 'pop' | 'stagger' | 'mask' | 'card';
 
@@ -107,7 +106,7 @@ const armers = { hero: [] as (() => void)[], rest: [] as (() => void)[] };
  * Trả về false khi không có lõi: lúc đó trang để nguyên, hiện đủ nội dung.
  */
 export function prepareReveals(): boolean {
-  if (reduceMotion || !getCore()) {
+  if (!getCore()) {
     document.documentElement.classList.add('no-motion');
     return false;
   }

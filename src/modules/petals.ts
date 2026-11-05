@@ -5,7 +5,6 @@
  */
 import { getCore } from '../vendor/motion-core/core';
 import { onFrame, wake } from '../vendor/motion-core/anim';
-import { reduceMotion } from './scroll';
 
 const COLORS = ['238, 196, 203', '246, 220, 224', '226, 235, 224', '252, 246, 238'];
 
@@ -31,7 +30,7 @@ function unitFills(ctx: CanvasRenderingContext2D): CanvasGradient[] {
 
 export function initPetals(canvas: HTMLCanvasElement): void {
   const core = getCore();
-  if (reduceMotion || !core) {
+  if (!core) {
     canvas.remove();
     return;
   }

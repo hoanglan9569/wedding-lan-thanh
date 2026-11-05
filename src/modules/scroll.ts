@@ -7,7 +7,10 @@ import { getCore } from '../vendor/motion-core/core';
 import { onFrame, wake } from '../vendor/motion-core/anim';
 import { refreshTracks, tickTracks } from './tracks';
 
-export const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// The OS "reduce motion" preference is deliberately not read. The owner's own PC
+// reports it (Windows Animation effects off), and honouring it left his page with
+// no motion at all; he wants every guest to get the opening, the petal rain and
+// the reveals. scripts/check-motion.ts runs every check with it on and off.
 export const isCoarse = window.matchMedia('(pointer: coarse)').matches;
 
 const SETTLE_MS = 900;
@@ -64,7 +67,7 @@ export function initSmoothScroll(): void {
     keepAwake();
   });
 
-  if (reduceMotion || isCoarse) return;
+  if (isCoarse) return;
   smooth = true;
   // tay cầm để công cụ kiểm tra tắt cuộn mượt trước khi chụp ảnh ghép
   (window as unknown as { __scroll?: { disable(): void } }).__scroll = {
@@ -105,7 +108,7 @@ export function scrollToSection(hash: string): void {
     keepAwake();
     return;
   }
-  window.scrollTo({ top: Math.max(0, y), behavior: reduceMotion ? 'auto' : 'smooth' });
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
 }
 
 export function initAnchors(): void {
