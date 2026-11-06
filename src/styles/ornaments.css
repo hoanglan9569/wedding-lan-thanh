@@ -55,16 +55,16 @@
   pointer-events: none;
 }
 
-/* Vòng hoa hồng ôm chữ Song Hỷ: giữa hai người và trên đầu tấm thiệp.
+/* Vòng hoa hồng ôm dấu & giữa hai người và chữ lồng L&T trên đầu tấm thiệp.
    isolation giữ vòng hoa nằm sau chữ nhưng vẫn trên nền thiệp. */
 .pair__amp,
-.card__hy {
+.card__mono {
   position: relative;
   isolation: isolate;
 }
 
 .is-open .pair__amp::before,
-.is-open .card__hy::before {
+.is-open .card__mono::before {
   content: '';
   position: absolute;
   z-index: -1;
@@ -74,13 +74,13 @@
   pointer-events: none;
 }
 
-.card__hy {
+.card__mono {
   width: clamp(104px, 22vw, 128px);
   height: clamp(104px, 22vw, 128px);
   margin: 0.6rem auto 2rem;
 }
 
-.is-open .card__hy::before {
+.is-open .card__mono::before {
   inset: -14%;
   opacity: 0.75;
 }

@@ -214,23 +214,6 @@ section[id] {
   background-position: left center, right center;
 }
 
-/* Chữ Song Hỷ (囍): dấu hiệu hỷ sự tân hôn, tô vàng hồng.
-   Phông CJK có sẵn trên mọi hệ điều hành; chỉ là trang trí nên ẩn với trình đọc màn hình. */
-.hy {
-  display: inline-grid;
-  place-items: center;
-  font-family: 'Noto Serif SC', 'Noto Serif CJK SC', 'Songti SC', 'STSong', 'SimSun', 'PingFang SC',
-    'Microsoft YaHei', serif;
-  font-weight: 700;
-  font-style: normal;
-  line-height: 1;
-  color: var(--gold);
-  background: linear-gradient(160deg, #a0654f 0%, #d9b096 40%, #b07a62 60%, #8e5444 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 .h2 {
   font-family: var(--serif);
   font-weight: 500;

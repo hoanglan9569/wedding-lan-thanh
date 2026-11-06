@@ -103,7 +103,8 @@ Endpoint nhận `POST` JSON: `{ name, side, attend, guests, wish, at }`.
 `public/art/*.webp` là tranh màu nước do Krea 2 vẽ (hoa hồng phấn và hồng trắng, vòng hoa, dải hoa,
 cánh hồng rơi, dấu sáp hồng ngọc trai), đã tách nền trong suốt bằng
 `out/auto-warband-art/tools/wedding-rose-cutout.py` (job `jobs/wedding-rose.json`).
-Chữ Song Hỷ 囍 (hero, giữa cô dâu chú rể, đầu tấm thiệp) là chữ tô vàng hồng bằng CSS (`.hy`), không phải ảnh. Bản gốc nằm ở `assets-src/art/`. Vẽ lại hoặc thay tranh thì chép vào
+Script đó cắt viền theo nét đậm (vệt màu nước nhạt không tính) để nhành hồng, biểu tượng hoa nằm đúng giữa ảnh,
+và dời dải hoa cho bông hồng giữa nằm đúng trục giữa. Bản gốc nằm ở `assets-src/art/`. Vẽ lại hoặc thay tranh thì chép vào
 `assets-src/art/` đúng tên rồi chạy:
 
 ```bash

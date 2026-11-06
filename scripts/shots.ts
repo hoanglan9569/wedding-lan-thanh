@@ -134,7 +134,7 @@ async function contrast(page: Page): Promise<string[]> {
       '.card__when p',
       '.tl__addr',
       '.rsvp__note',
-      '.person__meta',
+      '.card__role',
       '.family__addr',
       '.footer__thanks',
       '.eyebrow',

@@ -50,15 +50,6 @@
   mix-blend-mode: soft-light;
 }
 
-.hero__hy {
-  font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
-  margin-bottom: clamp(0.7rem, 2vw, 1.1rem);
-  background: linear-gradient(160deg, #f6dccb 0%, #fff4ec 45%, #eec4b0 70%, #d9a58f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  filter: drop-shadow(0 2px 10px rgba(62, 34, 44, 0.35));
-}
-
 /* canvas là replaced element: inset:0 không kéo giãn được, phải cho width/height */
 .petals {
   position: absolute;
