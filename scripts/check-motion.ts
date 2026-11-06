@@ -205,6 +205,29 @@ async function checkReveal(page: Page, which: Which): Promise<Result> {
   return { check, ok: (v[0] ?? 1) < 0.5 && ramps(v), detail: trail(v) };
 }
 
+/** Desktop smooth scroll clamps the wheel to a measured page bottom: a stale bottom strands the
+ *  guest at the guest book (owner bug 2026-11-06). Wheel from the top and require the real bottom. */
+async function checkWheelToFooter(page: Page): Promise<Result> {
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await wait(400);
+  await page.mouse.move(720, 450);
+  for (let i = 0; i < 120; i++) {
+    await page.mouse.wheel(0, 500);
+    await wait(40);
+  }
+  await wait(1500);
+  const r = await page.evaluate(() => ({
+    y: Math.round(window.scrollY),
+    max: document.documentElement.scrollHeight - window.innerHeight,
+    footer: Math.round(document.querySelector('.footer')!.getBoundingClientRect().top),
+  }));
+  return {
+    check: 'mouse wheel reaches the footer',
+    ok: r.y >= r.max - 2 && r.footer < 900,
+    detail: `scrollY ${r.y} of ${r.max}, footer top ${r.footer}px`,
+  };
+}
+
 async function checkReload(page: Page): Promise<Result[]> {
   await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
   await wait(500);
@@ -247,6 +270,7 @@ async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
   results.push(await checkPetals(page));
   results.push(await checkReveal(page, 'first'));
   results.push(await checkReveal(page, 'last'));
+  if (s.device === 'desktop') results.push(await checkWheelToFooter(page));
   results.push(...(await checkReload(page)));
   results.push({ check: 'no console errors', ok: errors.length === 0, detail: errors.join(' | ').slice(0, 200) || 'none' });
   await context.close();

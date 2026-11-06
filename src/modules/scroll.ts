@@ -77,6 +77,10 @@ export function initSmoothScroll(): void {
   };
   core.scroll_bounds(maxScroll(), 0.13);
   core.scroll_set(window.scrollY, 1);
+  // Bánh xe bị chặn ở đáy cũ nếu trang dài ra sau lần đo cuối (ảnh lazy như bản đồ,
+  // sổ lưu bút, phông chữ): khách cuộn tới sổ lưu bút rồi không xuống được chân trang.
+  // Theo dõi chiều cao trang và đo lại mỗi khi nó đổi.
+  new ResizeObserver(() => core.scroll_bounds(maxScroll(), 0)).observe(document.body);
   window.addEventListener(
     'wheel',
     (event) => {
