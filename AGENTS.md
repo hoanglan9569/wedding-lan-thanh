@@ -4,7 +4,7 @@
 Wedding invitation for Hoang Lan & Tran Kim Thanh (29.11.2026). Vite 8, TS 7, WebAssembly motion core (no GSAP/Lenis). Pastel pink roses on pearl white, Vietnamese typography, mobile.
 - Public: https://lanthanh.pages.dev (Cloudflare Pages).
 - Guest links: https://lanthanh.pages.dev/moi.html (?to=, ?guest=, ?name=). Public, a Vite entry (moi.html + src/moi/, rolldownOptions.input), list saved in localStorage; gate `bun run check:moi [url]`.
-- Link previews: functions/_middleware.ts (Pages Function, HTMLRewriter) sets og:url, canonical and og/twitter description per guest link; Messenger opens og:url, so never hard-code a guest-blind og:url path. Names clean via DOM-free src/modules/guest-name.ts.
+- Link previews: functions/_middleware.ts (HTMLRewriter) sets og:url, canonical, description per guest link; Messenger opens og:url, never hard-code one. Names: DOM-free src/modules/guest-name.ts. Old shares stay cached per URL (Sharing Debugger 'Scrape Again').
 - Guest book: https://lanthanh.pages.dev/admin.html.
 - Backend: https://lanthanh-rsvp.hoanglan9569.workers.dev (Worker + KV).
 
@@ -51,16 +51,16 @@ Run bun run preview (port 4173) and bun scripts/shots.ts before submitting:
 - Clip-path flap contrast: Flap needs distinct shading or opening animation appears stationary.
 - Cormorant Garamond diacritic loss: Drops acute over ê (ế becomes ê). Headings and display serif must use Playfair Display.
 - Serif digit 1 confusion: Display serif 1 resembles I (29.11.2026 reads 29.II.2026). Numbers, dates, countdowns use Be Vietnam Pro.
-- Smooth scroll: Wheel-driven, desktop-only; overrides window.scrollTo. Warm-up scripts dispatch wheel events and call window.__scroll.disable(). The wheel target is clamped to a measured page bottom; a ResizeObserver on document.body in src/modules/scroll.ts re-measures it whenever the page height changes. Never replace it with a list of re-measure events (a stale bottom stranded guests at the guest book).
+- Smooth scroll: Wheel-driven, desktop-only; overrides window.scrollTo. Warm-up scripts dispatch wheel events and call window.__scroll.disable(). ResizeObserver on document.body in src/modules/scroll.ts clamps wheel target to page bottom; never replace with re-measure event lists.
 - WebKit smooth scroll: Programmatic scrollTo may stop short in WebKit with scroll-behavior: smooth; tests jump with behavior: 'instant'.
-- Sealed WebAssembly exports: Instance exports are sealed; Object.assign throws in strict mode. Copy to fresh object; verify dataset.engine === 'wasm'.
 - Redundant style writes: Rewriting identical transform/opacity triggers recalculation. Compare before writing.
 - Wishes edge cache: GET /wishes cached 30s at edge; admin approvals take up to 30s without cache-busting.
-- Watercolor alpha payload: Soft alpha keeps WebP large; quality cuts barely shrink files (art ~653 KB). Intro loads corner-sm (52 KB), seal (27 KB), wreath-sm (51 KB); high-res under html.is-open.
-- Watercolor edge straight cuts: Frame washes need horizontal CSS mask fade to hide straight cuts. Cutout source: out/auto-warband-art/tools/wedding-rose-cutout.py.
-- Cutout trim alpha: Trim must use strong alpha (> 0.5); faint watercolor stains at frame edge leave an empty strip and the centred motif sits off-axis; measure centring with out/wedding-rose/centre-shot.ts.
+- Watercolor alpha payload: Soft alpha keeps WebP large; quality cuts barely shrink files. Intro loads corner-sm, seal, wreath-sm; high-res under html.is-open.
+- Watercolor edge straight cuts: Frame washes need horizontal CSS mask fade to hide straight cuts.
 - Owner decision on cultural symbols: Owner rejected Chinese character 囍; never add Chinese characters or other unrequested cultural symbols. Pair section shows script '&' in rose wreath; card top shows 'L&T' monogram in wreath.
 - Replaced element inset: inset: 0 never stretches canvas/img; petal canvas needs width/height 100% or JS sizes buffer from wrong 300x150 box.
 - OS reduced motion: Owner PC reports prefers-reduced-motion: reduce; site ignores it on purpose (scroll.ts). Probes pass reducedMotion: null.
 - Restored scroll on refresh: Keep history.scrollRestoration = 'manual' and scroll to top while #intro exists, or envelope fades on scrolled page.
-- Overlay reveals: prepareReveals() hides elements at boot; armReveals('hero'|'rest') arms them later. Never hide when arming.
+- Sealed wasm exports: Object.assign on instance exports throws; copy to a fresh object, check dataset.engine === 'wasm'.
+- Overlay reveals: prepareReveals() hides at boot, armReveals('hero'|'rest') arms later; never hide when arming.
+- Cutout trim: trim on strong alpha (> 0.5) or the motif sits off-axis; check with out/wedding-rose/centre-shot.ts.
