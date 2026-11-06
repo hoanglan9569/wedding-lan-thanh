@@ -14,32 +14,35 @@
 @import '@fontsource/dancing-script/latin-400.css';
 @import '@fontsource/dancing-script/vietnamese-400.css';
 
-/* ---------- Tokens: một theme sáng, nền ngà ấm và hồng phấn nhạt ----------
-   Nền không bao giờ trắng tinh, chữ không bao giờ đen tuyền: tương phản đủ đọc
-   (chữ chính ~10:1, chữ phụ ~5.5:1) mà không chói mắt. */
+/* ---------- Tokens: hoa hồng phấn pastel trên nền trắng ngọc trai ----------
+   Nền trắng ấm (không trắng tinh), hồng pastel làm mảng màu, hồng đậm trầm làm
+   điểm nhấn chữ, vàng hồng (rose gold) cho nét kẻ mảnh. Chữ không bao giờ đen
+   tuyền: tương phản đủ đọc (chữ chính ~11:1, chữ phụ ~6.5:1) mà không chói mắt. */
 :root {
-  --paper: #fdfbf8;
-  --paper-warm: #fbf3ef;
-  --paper-blush: #f8e9e7;
-  --paper-sage: #f1f4ee;
-  --paper-deep: #efe4dc;
-  --ink: #3a332e;
-  --ink-2: #5c534b;
-  --ink-3: #7b7168;
-  --green: #3c5a46;
-  --green-2: #577a5f;
-  --sage: #a8bba9;
-  --blush: #d79aa5;
-  --blush-2: #c17d8c;
-  --blush-soft: #f6e2e3;
-  --gold: #c2a36b;
-  --line: rgba(58, 51, 46, 0.16);
-  --line-soft: rgba(58, 51, 46, 0.09);
-  --line-blush: rgba(215, 154, 165, 0.38);
-  --shadow-sm: 0 2px 12px rgba(96, 68, 58, 0.07);
-  --shadow-md: 0 16px 46px rgba(96, 68, 58, 0.1);
-  --shadow-lg: 0 34px 96px rgba(96, 68, 58, 0.17);
-  --shadow-blush: 0 18px 50px rgba(193, 125, 140, 0.16);
+  --paper: #fffcfb;
+  --paper-warm: #fef7f6;
+  --paper-blush: #fcedef;
+  --paper-pearl: #fdf6f7;
+  --paper-deep: #f5e4e7;
+  --ink: #3b2a30;
+  --ink-2: #5a4249;
+  --ink-3: #6d525a;
+  --accent: #8c4459;
+  --accent-2: #a45a6e;
+  --rose-mist: #f4cdd6;
+  --blush: #e2a3b2;
+  --blush-2: #c47c90;
+  --blush-soft: #f9e3e8;
+  --gold: #c39a7a;
+  --gold-2: #dcbca2;
+  --line: rgba(92, 52, 64, 0.16);
+  --line-soft: rgba(92, 52, 64, 0.09);
+  --line-blush: rgba(196, 124, 144, 0.4);
+  --line-gold: rgba(195, 154, 122, 0.55);
+  --shadow-sm: 0 2px 14px rgba(140, 68, 89, 0.07);
+  --shadow-md: 0 18px 50px rgba(140, 68, 89, 0.1);
+  --shadow-lg: 0 34px 96px rgba(140, 68, 89, 0.16);
+  --shadow-blush: 0 18px 50px rgba(196, 124, 144, 0.18);
 
   --serif: 'Playfair Display', 'Times New Roman', serif;
   --sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -69,9 +72,9 @@ html {
 body {
   margin: 0;
   background-color: var(--paper);
-  /* giấy ngà có chút ánh hồng ở hai góc, nhìn ấm hơn nền phẳng */
-  background-image: radial-gradient(60rem 40rem at 8% -6%, rgba(215, 154, 165, 0.13), transparent 60%),
-    radial-gradient(52rem 38rem at 104% 4%, rgba(168, 187, 169, 0.14), transparent 62%);
+  /* giấy trắng ngọc trai có ánh hồng phấn ở hai góc, nhìn mềm hơn nền phẳng */
+  background-image: radial-gradient(60rem 40rem at 8% -6%, rgba(226, 163, 178, 0.14), transparent 60%),
+    radial-gradient(52rem 38rem at 104% 4%, rgba(244, 205, 214, 0.22), transparent 62%);
   background-attachment: scroll;
   color: var(--ink);
   font-family: var(--sans);
@@ -129,7 +132,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--green-2);
+  outline: 2px solid var(--accent-2);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -173,7 +176,7 @@ section[id] {
   font-weight: 500;
   letter-spacing: 0.36em;
   text-transform: uppercase;
-  color: var(--green);
+  color: var(--accent);
   margin-bottom: 0.9rem;
 }
 
@@ -192,13 +195,40 @@ section[id] {
   font-feature-settings: 'lnum' 1, 'tnum' 1;
 }
 
-/* hai nét kẻ hồng hai bên nhãn mục */
+/* hai nét kẻ vàng hồng hai bên nhãn mục, mỗi nét kết bằng một hạt nhỏ */
 .center .eyebrow::before,
 .center .eyebrow::after {
   content: '';
-  width: clamp(1.4rem, 4vw, 2.6rem);
-  height: 1px;
-  background: var(--line-blush);
+  width: clamp(1.6rem, 4.6vw, 3rem);
+  height: 5px;
+  background: radial-gradient(circle, var(--gold) 0 2px, transparent 2.5px) no-repeat,
+    linear-gradient(var(--line-gold), var(--line-gold)) no-repeat;
+  background-size: 5px 5px, 100% 1px;
+}
+
+.center .eyebrow::before {
+  background-position: right center, left center;
+}
+
+.center .eyebrow::after {
+  background-position: left center, right center;
+}
+
+/* Chữ Song Hỷ (囍): dấu hiệu hỷ sự tân hôn, tô vàng hồng.
+   Phông CJK có sẵn trên mọi hệ điều hành; chỉ là trang trí nên ẩn với trình đọc màn hình. */
+.hy {
+  display: inline-grid;
+  place-items: center;
+  font-family: 'Noto Serif SC', 'Noto Serif CJK SC', 'Songti SC', 'STSong', 'SimSun', 'PingFang SC',
+    'Microsoft YaHei', serif;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  color: var(--gold);
+  background: linear-gradient(160deg, #a0654f 0%, #d9b096 40%, #b07a62 60%, #8e5444 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .h2 {
@@ -238,8 +268,8 @@ section[id] {
   z-index: 1;
 }
 
-/* Hoa sen vẽ bằng Krea 2 (tranh màu nước, nền trong suốt), dùng lại nhiều nơi */
-.lotus-art {
+/* Nhành hồng vẽ bằng Krea 2 (tranh màu nước, nền trong suốt), dùng lại nhiều nơi */
+.rose-art {
   display: block;
   width: 100%;
   height: 100%;

@@ -21,7 +21,7 @@ bun run typecheck
 | Phần | Nội dung |
 | --- | --- |
 | Màn mở thiệp | Phong bì có dấu niêm phong: bẻ dấu, mở nắp, tấm thiệp trượt lên rồi tan vào ảnh cưới. Mở được bằng cách chạm dấu niêm phong, cuộn xuống hoặc nhấn phím. Tên khách lấy từ đường dẫn |
-| Hero | Ảnh cưới toàn màn hình, ken burns + parallax, mưa cánh sen trên canvas |
+| Hero | Ảnh cưới toàn màn hình, ken burns + parallax, mưa cánh hồng trên canvas |
 | Đếm ngược | Đếm tới 11:00 ngày 29.11.2026, nút tải `.ics` và Google Calendar |
 | Lời ngỏ | Thư ngỏ gửi khách mời |
 | Chú rể & Cô dâu | Hai ảnh đơn, tên cha mẹ hai bên |
@@ -100,8 +100,10 @@ Endpoint nhận `POST` JSON: `{ name, side, attend, guests, wish, at }`.
 
 ## Tranh trang trí
 
-`public/art/*.webp` là tranh màu nước do Krea 2 vẽ (hoa sen, lá bạch đàn, cánh hoa rơi, dấu niêm phong),
-đã tách nền trong suốt. Bản gốc nằm ở `assets-src/art/`. Vẽ lại hoặc thay tranh thì chép vào
+`public/art/*.webp` là tranh màu nước do Krea 2 vẽ (hoa hồng phấn và hồng trắng, vòng hoa, dải hoa,
+cánh hồng rơi, dấu sáp hồng ngọc trai), đã tách nền trong suốt bằng
+`out/auto-warband-art/tools/wedding-rose-cutout.py` (job `jobs/wedding-rose.json`).
+Chữ Song Hỷ 囍 (hero, giữa cô dâu chú rể, đầu tấm thiệp) là chữ tô vàng hồng bằng CSS (`.hy`), không phải ảnh. Bản gốc nằm ở `assets-src/art/`. Vẽ lại hoặc thay tranh thì chép vào
 `assets-src/art/` đúng tên rồi chạy:
 
 ```bash

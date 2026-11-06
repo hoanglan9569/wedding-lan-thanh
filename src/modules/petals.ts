@@ -1,18 +1,22 @@
 /**
- * Mưa cánh sen trên hero. Lõi wasm chạy toàn bộ mô phỏng và trả về ma trận
+ * Mưa cánh hồng trên hero. Lõi wasm chạy toàn bộ mô phỏng và trả về ma trận
  * canvas tính sẵn theo pixel thiết bị, nên JS mỗi khung chỉ còn setTransform
  * và fill; gradient và đường cong dựng một lần rồi dùng lại.
  */
 import { getCore } from '../vendor/motion-core/core';
 import { onFrame, wake } from '../vendor/motion-core/anim';
 
-const COLORS = ['238, 196, 203', '246, 220, 224', '226, 235, 224', '252, 246, 238'];
+/** hồng phấn, hồng pastel, trắng ngà, hồng sữa */
+const COLORS = ['240, 188, 200', '248, 214, 222', '255, 250, 246', '252, 230, 234'];
 
+/** Cánh hoa hồng: đầu rộng, tròn, hơi lõm ở giữa mép; thon dần về chân cánh. */
 function unitPetal(): Path2D {
   const p = new Path2D();
-  p.moveTo(0, -1);
-  p.bezierCurveTo(0.74, -0.42, 0.6, 0.62, 0, 1);
-  p.bezierCurveTo(-0.6, 0.62, -0.74, -0.42, 0, -1);
+  p.moveTo(0, 1);
+  p.bezierCurveTo(-0.55, 0.72, -0.95, 0.08, -0.82, -0.46);
+  p.bezierCurveTo(-0.68, -0.94, -0.22, -1, 0, -0.8);
+  p.bezierCurveTo(0.22, -1, 0.68, -0.94, 0.82, -0.46);
+  p.bezierCurveTo(0.95, 0.08, 0.55, 0.72, 0, 1);
   p.closePath();
   return p;
 }

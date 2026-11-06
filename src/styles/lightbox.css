@@ -39,7 +39,7 @@
   font-size: 0.74rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(252, 250, 247, 0.72);
+  color: rgba(255, 252, 251, 0.72);
 }
 
 .lightbox__nav,
@@ -48,7 +48,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 1px solid rgba(252, 250, 247, 0.3);
+  border: 1px solid rgba(255, 252, 251, 0.3);
   border-radius: 50%;
   background: transparent;
   color: var(--paper);
@@ -60,7 +60,7 @@
 
 .lightbox__nav:hover,
 .lightbox__close:hover {
-  background: rgba(252, 250, 247, 0.14);
+  background: rgba(255, 252, 251, 0.14);
 }
 
 .lightbox__close {

@@ -1,6 +1,6 @@
 /* ================= CHƯƠNG TRÌNH ================= */
 .events {
-  background: var(--paper-sage);
+  background: var(--paper-pearl);
 }
 
 .events__date {
@@ -41,7 +41,7 @@
   width: 15px;
   height: 15px;
   border-radius: 50%;
-  border: 1px solid var(--green-2);
+  border: 1px solid var(--accent-2);
   background: var(--paper);
 }
 
@@ -60,7 +60,7 @@
 .tl__time {
   font-size: 1.12rem;
   font-weight: 500;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 0.16em;
 }
 
@@ -87,15 +87,15 @@
   font-size: 0.7rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--green-2);
+  color: var(--accent-2);
   border-bottom: 1px solid var(--line);
   padding-bottom: 2px;
   transition: border-color 0.3s, color 0.3s;
 }
 
 .tl__map:hover {
-  color: var(--green);
-  border-color: var(--green);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Máy tính: hai mốc nằm ngang cho kín bề ngang, đường kẻ chạy giữa hai chấm */
@@ -167,7 +167,7 @@
   inset-inline: 0;
   bottom: 0;
   padding: 2.6rem 1rem 0.9rem;
-  background: linear-gradient(180deg, transparent, rgba(30, 26, 22, 0.55));
+  background: linear-gradient(180deg, transparent, rgba(62, 34, 44, 0.55));
   color: var(--paper);
   font-size: 0.66rem;
   letter-spacing: 0.26em;
@@ -265,7 +265,7 @@
   font-size: 0.68rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--green-2);
+  color: var(--accent-2);
 }
 
 /* Chưa có lời chúc nào thì mục này vẫn phải ra dáng một mục, không trơ trọi */
@@ -312,15 +312,15 @@
 .footer {
   padding: clamp(3.4rem, 8vw, 6rem) var(--gap) calc(2.6rem + env(safe-area-inset-bottom));
   text-align: center;
-  background: var(--green);
-  color: var(--paper-warm);
+  background: linear-gradient(180deg, var(--paper-blush) 0%, #f8dfe5 100%);
+  color: var(--ink);
+  border-top: 1px solid var(--line-gold);
 }
 
 .footer__mark {
-  width: 128px;
-  height: 64px;
+  width: 156px;
+  height: 78px;
   margin: 0 auto 1.4rem;
-  opacity: 0.9;
 }
 
 .footer__names {
@@ -334,7 +334,7 @@
   margin-top: 0.4rem;
   font-size: 0.8rem;
   letter-spacing: 0.4em;
-  color: var(--sage);
+  color: var(--accent);
 }
 
 .footer__thanks {
@@ -343,7 +343,7 @@
   font-family: var(--serif);
   font-style: italic;
   font-size: 1.08rem;
-  color: rgba(246, 239, 230, 0.86);
+  color: var(--ink-2);
 }
 
 .footer__top {
@@ -352,6 +352,7 @@
   font-size: 0.66rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  border-bottom: 1px solid rgba(246, 239, 230, 0.4);
+  color: var(--accent);
+  border-bottom: 1px solid var(--line-gold);
   padding-bottom: 3px;
 }

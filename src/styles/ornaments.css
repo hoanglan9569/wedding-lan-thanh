@@ -1,6 +1,6 @@
 /* ================================================================
-   Điểm nhấn hình ảnh: tranh màu nước do Krea 2 vẽ, đặt bằng nền CSS
-   nên thiếu tệp nào thì chỗ đó chỉ đơn giản là trống, không vỡ bố cục.
+   Điểm nhấn hình ảnh: tranh màu nước hoa hồng phấn do Krea 2 vẽ, đặt bằng nền
+   CSS nên thiếu tệp nào thì chỗ đó chỉ đơn giản là trống, không vỡ bố cục.
    Chỉ tải sau khi khách mở thiệp (html.is-open) để lần đầu vào trang nhẹ.
    ================================================================ */
 
@@ -15,76 +15,95 @@
   overflow: hidden;
 }
 
-/* Cánh hoa rơi nối ảnh cưới xuống phần đếm ngược */
+/* Cánh hồng rơi nối ảnh cưới xuống phần đếm ngược */
 .is-open .countdown::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
   height: clamp(120px, 17vw, 200px);
   background: url('/art/petal-fall.webp') no-repeat center top / cover;
-  opacity: 0.4;
+  opacity: 0.42;
   pointer-events: none;
   -webkit-mask-image: linear-gradient(#000 18%, transparent 100%);
   mask-image: linear-gradient(#000 18%, transparent 100%);
 }
 
-/* Nhành sen góc dưới bên trái của lời ngỏ */
+/* Khóm hồng góc dưới bên trái của lời ngỏ */
 .is-open .letter::before {
   content: '';
   position: absolute;
   left: -3%;
   bottom: -5%;
-  width: min(44vw, 400px);
+  width: min(46vw, 420px);
   aspect-ratio: 1;
   background: url('/art/corner-spray.webp') no-repeat left bottom / contain;
-  opacity: 0.45;
+  opacity: 0.6;
   pointer-events: none;
 }
 
-/* Nhành sen lật ngược ở góc trên bên phải phần cô dâu chú rể */
+/* Khóm hồng lật ngược ở góc trên bên phải phần cô dâu chú rể */
 .is-open .pair::before {
   content: '';
   position: absolute;
   right: -4%;
   top: -2%;
-  width: min(38vw, 340px);
+  width: min(38vw, 360px);
   aspect-ratio: 1;
-  background: url('/art/corner-spray.webp') no-repeat right top / contain;
-  opacity: 0.3;
-  transform: scaleX(-1) rotate(180deg);
+  background: url('/art/corner-spray.webp') no-repeat left bottom / contain;
+  opacity: 0.5;
+  transform: rotate(180deg);
   pointer-events: none;
 }
 
-/* Vòng hoa sau dấu & giữa hai người */
-.pair__amp {
+/* Vòng hoa hồng ôm chữ Song Hỷ: giữa hai người và trên đầu tấm thiệp.
+   isolation giữ vòng hoa nằm sau chữ nhưng vẫn trên nền thiệp. */
+.pair__amp,
+.card__hy {
   position: relative;
+  isolation: isolate;
 }
 
-.is-open .pair__amp::before {
+.is-open .pair__amp::before,
+.is-open .card__hy::before {
   content: '';
   position: absolute;
-  inset: -135% -75%;
+  z-index: -1;
+  inset: -32%;
   background: url('/art/wreath.webp') no-repeat center / contain;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.card__hy {
+  width: clamp(104px, 22vw, 128px);
+  height: clamp(104px, 22vw, 128px);
+  margin: 0.6rem auto 2rem;
+}
+
+.is-open .card__hy::before {
+  inset: -14%;
+  opacity: 0.75;
+}
+
+/* Khóm hồng mờ ở góc dưới bên phải tấm thiệp, nằm gọn trong khung thiệp */
+.is-open .card3d__inner::before {
+  content: '';
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: min(30%, 180px);
+  aspect-ratio: 1;
+  background: url('/art/corner-spray.webp') no-repeat left bottom / contain;
+  transform: scaleX(-1);
   opacity: 0.4;
   pointer-events: none;
 }
 
-/* Vòng hoa mờ trên đầu tấm thiệp: phải nằm gọn bên trong khung thiệp,
-   không được tràn lên khỏi mép trên và không được to hơn khối chữ đầu thiệp. */
-.is-open .card3d__inner::before {
-  content: '';
-  position: absolute;
-  top: clamp(18px, 3.2vw, 34px);
-  left: 50%;
-  translate: -50% 0;
-  width: min(52%, 264px);
-  aspect-ratio: 1;
-  background: url('/art/wreath.webp') no-repeat center top / contain;
-  opacity: 0.22;
-  pointer-events: none;
+.card3d__inner > * {
+  position: relative;
 }
 
-/* Đường hoa ngăn mục */
+/* Dải hoa hồng ngăn mục */
 .is-open .events::before,
 .is-open .venue::before,
 .is-open .rsvp::before,
@@ -94,31 +113,50 @@
   top: clamp(1.5rem, 4vw, 3.2rem);
   left: 50%;
   translate: -50% 0;
-  width: min(76vw, 500px);
-  height: clamp(46px, 7vw, 84px);
+  width: min(80vw, 540px);
+  height: clamp(52px, 8vw, 96px);
   background: url('/art/divider.webp') no-repeat center / contain;
-  opacity: 0.55;
+  opacity: 0.8;
   pointer-events: none;
+  /* vệt màu nước bị khung ảnh cắt thẳng ở hai đầu: làm mờ dần cho mềm */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
 }
 
 .events,
 .venue,
 .rsvp,
 .wishes {
-  padding-top: calc(var(--section-y) + clamp(2.2rem, 5vw, 4rem));
+  padding-top: calc(var(--section-y) + clamp(2.4rem, 5.4vw, 4.4rem));
 }
 
-/* Cánh hoa phủ nhẹ trên chân trang xanh */
+/* Cánh hồng phủ nhẹ trên chân trang hồng phấn, thêm khóm hồng ở hai góc */
 .is-open .footer::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
   height: clamp(100px, 14vw, 170px);
   background: url('/art/petal-fall.webp') no-repeat center top / cover;
-  opacity: 0.14;
+  opacity: 0.28;
   pointer-events: none;
   -webkit-mask-image: linear-gradient(#000, transparent);
   mask-image: linear-gradient(#000, transparent);
+}
+
+.is-open .footer::after {
+  content: '';
+  position: absolute;
+  left: -3%;
+  bottom: -6%;
+  width: min(40vw, 320px);
+  aspect-ratio: 1;
+  background: url('/art/corner-spray.webp') no-repeat left bottom / contain;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.footer {
+  position: relative;
 }
 
 .footer > * {

@@ -3,7 +3,7 @@
   --btn-bg: transparent;
   --btn-fg: var(--ink);
   --btn-bd: var(--line);
-  --btn-fill: var(--green);
+  --btn-fill: var(--accent);
   --btn-fill-fg: var(--paper);
   position: relative;
   display: inline-flex;
@@ -58,16 +58,16 @@
 }
 
 .btn--solid {
-  --btn-bg: var(--green);
+  --btn-bg: var(--accent);
   --btn-fg: var(--paper);
-  --btn-bd: var(--green);
+  --btn-bd: var(--accent);
   --btn-fill: var(--ink);
   --btn-fill-fg: var(--paper);
 }
 
 /* Chỉ đổi màu nền, không dùng cách viết tắt `background` vì nó xoá luôn lớp nền chạy lên */
 .btn--ghost {
-  background-color: rgba(252, 250, 247, 0.72);
+  background-color: rgba(255, 252, 251, 0.72);
   backdrop-filter: blur(8px);
 }
 
@@ -94,7 +94,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.7rem clamp(0.9rem, 3vw, 2rem);
-  background: rgba(252, 250, 247, 0);
+  background: rgba(255, 252, 251, 0);
   transform: translateY(-110%);
   transition: background 0.45s var(--ease-soft), box-shadow 0.45s var(--ease-soft),
     transform 0.6s var(--ease-out);
@@ -103,7 +103,7 @@
 
 .topbar--on {
   transform: translateY(0);
-  background: rgba(252, 250, 247, 0.86);
+  background: rgba(255, 252, 251, 0.86);
   backdrop-filter: blur(14px) saturate(1.1);
   box-shadow: 0 1px 0 var(--line-soft);
 }
@@ -112,7 +112,7 @@
   font-family: var(--serif);
   font-size: 1.1rem;
   letter-spacing: 0.14em;
-  color: var(--green);
+  color: var(--accent);
 }
 
 .topbar__nav {
@@ -137,14 +137,14 @@
   bottom: 0;
   width: 100%;
   height: 1px;
-  background: var(--green-2);
+  background: var(--accent-2);
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.4s var(--ease-out);
 }
 
 .topbar__nav a:hover {
-  color: var(--green);
+  color: var(--accent);
 }
 
 .topbar__nav a:hover::after {
@@ -173,14 +173,14 @@
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: rgba(252, 250, 247, 0.72);
+  background: rgba(255, 252, 251, 0.72);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.3s, background 0.3s;
 }
 
 .iconbtn:hover {
-  border-color: var(--green-2);
+  border-color: var(--accent-2);
 }
 
 .eq {
@@ -193,7 +193,7 @@
 .eq i {
   width: 2px;
   height: 4px;
-  background: var(--green);
+  background: var(--accent);
   border-radius: 1px;
   transition: height 0.3s;
 }
@@ -259,8 +259,8 @@
 .field input:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--green-2);
-  box-shadow: 0 0 0 3px rgba(90, 122, 95, 0.12);
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(196, 124, 144, 0.16);
 }
 
 .field textarea {
@@ -296,20 +296,20 @@
 }
 
 .choice input:checked + span {
-  background: var(--green);
-  border-color: var(--green);
+  background: var(--accent);
+  border-color: var(--accent);
   color: var(--paper);
 }
 
 .choice input:focus-visible + span {
-  outline: 2px solid var(--green-2);
+  outline: 2px solid var(--accent-2);
   outline-offset: 2px;
 }
 
 .form__status {
   min-height: 1.4rem;
   font-size: 0.82rem;
-  color: var(--green);
+  color: var(--accent);
 }
 
 .form__status--err {
