@@ -1,16 +1,8 @@
-const KEYS = ['to', 'guest', 'khach', 'name'];
-const MAX = 64;
+import { cleanGuestName } from './guest-name';
 
-/** Làm sạch tên khách; trang tạo link (moi.html) dùng chung để link khớp với tên hiện trên thiệp. */
-export function cleanGuestName(raw: string): string {
-  // NFC: links typed on iOS/macOS often carry decomposed marks (i + U+0300), which some fonts stack badly.
-  return raw
-    .normalize('NFC')
-    .replace(/[<>{}[\]\\|`]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, MAX);
-}
+export { cleanGuestName };
+
+const KEYS = ['to', 'guest', 'khach', 'name'];
 
 /** Tên khách lấy từ đường dẫn: ...?to=Anh%20Nam -> "Anh Nam". */
 export function guestName(): string | null {
