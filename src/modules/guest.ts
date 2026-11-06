@@ -1,7 +1,8 @@
 const KEYS = ['to', 'guest', 'khach', 'name'];
 const MAX = 64;
 
-function clean(raw: string): string {
+/** Làm sạch tên khách; trang tạo link (moi.html) dùng chung để link khớp với tên hiện trên thiệp. */
+export function cleanGuestName(raw: string): string {
   return raw
     .replace(/[<>{}[\]\\|`]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -14,7 +15,7 @@ export function guestName(): string | null {
   const params = new URLSearchParams(window.location.search);
   for (const key of KEYS) {
     const raw = params.get(key);
-    if (raw && clean(raw)) return clean(raw);
+    if (raw && cleanGuestName(raw)) return cleanGuestName(raw);
   }
   return null;
 }

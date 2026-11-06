@@ -15,6 +15,7 @@
     "optimize:art": "bun scripts/optimize-art.ts",
     "shots": "bun scripts/shots.ts",
     "check:motion": "bun scripts/check-motion.ts",
+    "check:moi": "bun scripts/check-moi.ts",
     "deploy": "bun run build && bunx wrangler pages deploy dist --project-name lanthanh --commit-dirty=true",
     "rsvp:list": "cd worker && bunx wrangler kv key list --binding RSVP",
     "rsvp:deploy": "cd worker && bunx wrangler deploy"

@@ -3,7 +3,7 @@
 ## Overview and Deployment
 Wedding invitation for Hoang Lan & Tran Kim Thanh (29.11.2026). Vite 8, TS 7, WebAssembly motion core (no GSAP/Lenis). Pastel pink roses on pearl white, Vietnamese typography, mobile.
 - Public: https://lanthanh.pages.dev (Cloudflare Pages).
-- Guest links: https://lanthanh.pages.dev/moi.html (?to=, ?guest=, ?name=).
+- Guest links: https://lanthanh.pages.dev/moi.html (?to=, ?guest=, ?name=). Public, a Vite entry (moi.html + src/moi/, rolldownOptions.input), list saved in localStorage; gate `bun run check:moi [url]`.
 - Guest book: https://lanthanh.pages.dev/admin.html.
 - Backend: https://lanthanh-rsvp.hoanglan9569.workers.dev (Worker + KV).
 

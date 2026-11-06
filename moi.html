@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#fdf6f7" />
+    <title>Tạo link mời · Lân &amp; Thanh</title>
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="head">
+        <p class="eyebrow">Lân &amp; Thanh · 29.11.2026</p>
+        <h1>Tạo link mời</h1>
+        <p class="sub">Mỗi khách một đường dẫn riêng, mở ra là thấy tên mình trên thiệp.</p>
+      </header>
+
+      <section class="panel">
+        <label for="names">Danh sách khách</label>
+        <p class="note">Mỗi dòng một tên, ghi đúng như muốn hiện trên thiệp.</p>
+        <textarea id="names" rows="6" placeholder="Anh Nam và gia đình&#10;Cô Tư&#10;Bạn Minh và người thương"></textarea>
+
+        <details class="more">
+          <summary>Lời nhắn gửi kèm</summary>
+          <p class="note"><code>{ten}</code> là tên khách, <code>{link}</code> là đường dẫn thiệp.</p>
+          <textarea id="message" rows="5"></textarea>
+          <button id="resetMessage" class="ghost small" type="button">Dùng lời nhắn mặc định</button>
+        </details>
+
+        <div class="actions">
+          <button id="copyAll" class="ghost" type="button">Chép tất cả</button>
+          <button id="clear" class="ghost" type="button">Xoá danh sách</button>
+        </div>
+      </section>
+
+      <p class="hint" id="hint" aria-live="polite"></p>
+      <ol class="out" id="out"></ol>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/moi/main.ts"></script>
+  </body>
+</html>

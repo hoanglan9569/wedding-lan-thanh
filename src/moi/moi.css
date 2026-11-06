@@ -1,0 +1,117 @@
+@import '@fontsource/playfair-display/latin-500.css';
+@import '@fontsource/playfair-display/vietnamese-500.css';
+@import '@fontsource/be-vietnam-pro/latin-400.css';
+@import '@fontsource/be-vietnam-pro/latin-500.css';
+@import '@fontsource/be-vietnam-pro/vietnamese-400.css';
+@import '@fontsource/be-vietnam-pro/vietnamese-500.css';
+
+/* Cùng bảng màu với thiệp (src/styles/base.css). */
+:root {
+  --paper: #fffcfb;
+  --paper-pearl: #fdf6f7;
+  --ink: #3b2a30;
+  --ink-3: #6d525a;
+  --accent: #8c4459;
+  --blush-soft: #f9e3e8;
+  --line: rgba(92, 52, 64, 0.16);
+  --shadow-sm: 0 2px 14px rgba(140, 68, 89, 0.07);
+  --serif: 'Playfair Display', 'Times New Roman', serif;
+  --sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 2rem 1rem calc(4rem + env(safe-area-inset-bottom));
+  background: var(--paper-pearl);
+  color: var(--ink);
+  font: 400 16px/1.65 var(--sans);
+  -webkit-text-size-adjust: 100%;
+}
+
+.shell { width: min(100%, 680px); margin-inline: auto; }
+
+.head { text-align: center; margin-bottom: 1.6rem; }
+.eyebrow { margin: 0; font-size: 0.74rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0.3rem 0 0.2rem; font: 500 clamp(1.8rem, 6vw, 2.4rem)/1.25 var(--serif); }
+.sub { margin: 0; color: var(--ink-3); font-size: 0.94rem; }
+
+.panel {
+  padding: 1.2rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+label, summary { font-weight: 500; color: var(--accent); }
+summary { cursor: pointer; padding: 0.2rem 0; }
+.note { margin: 0.1rem 0 0.5rem; font-size: 0.84rem; color: var(--ink-3); }
+code { font-size: 0.82rem; background: var(--blush-soft); padding: 0.05rem 0.3rem; border-radius: 4px; }
+
+textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  font: inherit;
+  font-size: 16px; /* iOS không tự phóng to khi gõ */
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  resize: vertical;
+}
+textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.more { margin-top: 1rem; }
+.more textarea { margin-bottom: 0.6rem; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+
+button {
+  min-height: 44px;
+  padding: 0.6rem 1.2rem;
+  font: 500 0.88rem/1.2 var(--sans);
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  cursor: pointer;
+}
+button.ghost { color: var(--accent); background: transparent; border-color: var(--line); }
+button.small { min-height: 40px; padding: 0.45rem 0.95rem; font-size: 0.82rem; }
+button:active { transform: translateY(1px); }
+
+.hint { text-align: center; color: var(--ink-3); font-size: 0.88rem; margin: 1.2rem 0 0.8rem; }
+
+.out { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+
+.item {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.item b { font-weight: 500; font-size: 1.02rem; }
+.item a { color: var(--accent); font-size: 0.84rem; word-break: break-all; text-decoration: none; }
+.tools { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.3rem; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.4rem + env(safe-area-inset-bottom));
+  max-width: calc(100% - 2rem);
+  padding: 0.6rem 1.1rem;
+  color: #fff;
+  background: var(--ink);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
