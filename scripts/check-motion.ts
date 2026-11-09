@@ -255,29 +255,56 @@ async function checkReload(page: Page): Promise<Result[]> {
   ];
 }
 
+async function checkScrollOrSwipeOpen(page: Page, s: Scenario): Promise<Result> {
+  if (s.device === 'desktop') {
+    await page.mouse.wheel(0, 120);
+  } else {
+    await page.evaluate(() => {
+      const mk = (type: string, y: number): Event =>
+        Object.assign(new Event(type, { bubbles: true }), {
+          touches: type === 'touchend' ? [] : [{ clientX: 200, clientY: y }],
+        });
+      window.dispatchEvent(mk('touchstart', 500));
+      window.dispatchEvent(mk('touchmove', 420));
+      window.dispatchEvent(mk('touchend', 420));
+    });
+  }
+  await wait(3600);
+  const opened = await page.evaluate(() => !document.querySelector('#intro') && document.documentElement.classList.contains('is-open'));
+  await page.reload({ waitUntil: 'load' });
+  await wait(400);
+  return {
+    check: s.device === 'desktop' ? 'mouse wheel opens the envelope' : 'touch swipe opens the envelope',
+    ok: opened,
+    detail: `opened=${opened}`,
+  };
+}
+
 async function checkMusicReload(page: Page): Promise<Result[]> {
   await page.click('#intro-open');
-  await wait(3600);
+  await wait(500);
+  const duringOpen = await page.evaluate(() => document.querySelector('#music-toggle')?.getAttribute('aria-pressed'));
+  await wait(3100);
   const secondVisit = await page.evaluate(() => ({
     pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
     local: localStorage.getItem('lanthanh:music:muted'),
     session: sessionStorage.getItem('lanthanh:music:muted'),
   }));
-  await page.click('#music-toggle');
+  await page.evaluate(() => document.querySelector<HTMLButtonElement>('#music-toggle')?.click());
   await wait(100);
   await page.reload({ waitUntil: 'load' });
   await wait(400);
   await page.click('#intro-open');
-  await wait(600);
+  await wait(3600);
   const mutedVisit = await page.evaluate(() => ({
     pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
     local: localStorage.getItem('lanthanh:music:muted'),
   }));
   return [
     {
-      check: 'music plays on second visit when not muted',
-      ok: secondVisit.pressed === 'true' && secondVisit.local !== '1' && secondVisit.session !== '1',
-      detail: `pressed=${secondVisit.pressed} local=${secondVisit.local} session=${secondVisit.session}`,
+      check: 'music plays after envelope finishes opening on revisit',
+      ok: duringOpen === 'false' && secondVisit.pressed === 'true' && secondVisit.local !== '1' && secondVisit.session !== '1',
+      detail: `during=${duringOpen} after=${secondVisit.pressed} local=${secondVisit.local}`,
     },
     {
       check: 'music stays muted on next visit only after muting',
@@ -304,6 +331,7 @@ async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
   results.push(await checkReveal(page, 'last'));
   if (s.device === 'desktop') results.push(await checkWheelToFooter(page));
   results.push(...(await checkReload(page)));
+  results.push(await checkScrollOrSwipeOpen(page, s));
   results.push(...(await checkMusicReload(page)));
   results.push({ check: 'no console errors', ok: errors.length === 0, detail: errors.join(' | ').slice(0, 200) || 'none' });
   await context.close();

@@ -9,6 +9,7 @@
   background: radial-gradient(60rem 42rem at 50% -8%, #fffdfc 0%, transparent 62%),
     linear-gradient(168deg, #fffcfb 0%, #fcf0f2 46%, #f8e0e6 100%);
   overflow: hidden;
+  touch-action: none;
 }
 
 /* Hai khóm hồng ở góc màn phong bì (bản nhỏ, nhẹ cho lần tải đầu) */

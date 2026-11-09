@@ -84,48 +84,33 @@ function entrance(overlay: HTMLElement): void {
 /** Mở được bằng ba cách: bấm dấu niêm phong, cuộn xuống, hoặc bàn phím. */
 function bindOpeners(overlay: HTMLElement, open: () => void): () => void {
   const seal = overlay.querySelector<HTMLElement>('#intro-open');
-  const hint = overlay.querySelector<HTMLElement>('#intro-hint');
   let touchStart = 0;
-  let swiped = false;
-
-  const nudge = (): void => {
-    if (seal) anim.fromTo(seal, { scale: 1 }, { scale: 1.14 }, { duration: 0.22, ease: 'out2' });
-    if (hint) anim.fromTo(hint, { scale: 1 }, { scale: 1.06 }, { duration: 0.22, ease: 'out2' });
-  };
 
   const onWheel = (event: WheelEvent): void => {
-    if (event.deltaY <= 6) return;
-    if (navigator.userActivation?.hasBeenActive) open();
-    else nudge();
+    if (event.deltaY > 6) open();
   };
   const onTouchStart = (event: TouchEvent): void => {
     touchStart = event.touches[0]?.clientY ?? 0;
-    swiped = false;
   };
   const onTouchMove = (event: TouchEvent): void => {
     const y = event.touches[0]?.clientY ?? 0;
-    if (touchStart - y > 22) swiped = true;
-  };
-  const onTouchEnd = (): void => {
-    if (swiped) open();
+    if (touchStart - y > 22) open();
   };
   const onKey = (event: KeyboardEvent): void => {
     if ([' ', 'Spacebar', 'ArrowDown', 'PageDown', 'Enter'].includes(event.key)) open();
   };
 
-  overlay.addEventListener('click', open);
+  seal?.addEventListener('click', open);
   window.addEventListener('wheel', onWheel, { passive: true });
   window.addEventListener('touchstart', onTouchStart, { passive: true });
   window.addEventListener('touchmove', onTouchMove, { passive: true });
-  window.addEventListener('touchend', onTouchEnd, { passive: true });
   window.addEventListener('keydown', onKey);
 
   return () => {
-    overlay.removeEventListener('click', open);
+    seal?.removeEventListener('click', open);
     window.removeEventListener('wheel', onWheel);
     window.removeEventListener('touchstart', onTouchStart);
     window.removeEventListener('touchmove', onTouchMove);
-    window.removeEventListener('touchend', onTouchEnd);
     window.removeEventListener('keydown', onKey);
   };
 }
@@ -143,7 +128,6 @@ export function initIntro(): void {
     if (opened) return;
     opened = true;
     unbind();
-    if (musicWanted()) void startMusic();
     if (animated) openSequence(overlay, () => finish(overlay, false));
     else finish(overlay, true);
   };

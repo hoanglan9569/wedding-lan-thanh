@@ -1,15 +1,16 @@
 import { music } from '../data/wedding';
+import * as anim from '../vendor/motion-core/anim';
 import { asset } from './gallery';
 
 const KEY = 'lanthanh:music:muted';
 const LEGACY_KEY = 'lanthanh:music';
-const UNLOCK_EVENTS = ['touchend', 'click', 'keydown'] as const;
+const GESTURE_EVENTS = ['touchend', 'pointerup', 'click', 'keydown'] as const;
 
 let audio: HTMLAudioElement | null = null;
 let button: HTMLButtonElement | null = null;
 let stopTimer = 0;
-let fadeRaf = 0;
-let unlockArmed = false;
+let primed = false;
+let started = false;
 let playing = false;
 
 function setPressed(on: boolean): void {
@@ -33,94 +34,95 @@ function saveMuted(muted: boolean): void {
   }
 }
 
-function onUnlockGesture(event: Event): void {
+function onGesture(event: Event): void {
   if (button && event.target instanceof Node && button.contains(event.target)) return;
-  if (!musicWanted()) {
-    disarmUnlock();
+  if (!musicWanted()) return;
+  if (started) {
+    if (!playing || audio?.paused) void startMusic();
     return;
   }
-  void startMusic();
-}
-
-function armUnlock(): void {
-  if (unlockArmed) return;
-  unlockArmed = true;
-  for (const type of UNLOCK_EVENTS) {
-    window.addEventListener(type, onUnlockGesture, { capture: true, passive: true });
-  }
-}
-
-function disarmUnlock(): void {
-  if (!unlockArmed) return;
-  unlockArmed = false;
-  for (const type of UNLOCK_EVENTS) {
-    window.removeEventListener(type, onUnlockGesture, { capture: true });
+  if (!audio || primed) return;
+  primed = true;
+  audio.muted = true;
+  const p = audio.play();
+  if (p) {
+    p.then(() => {
+      if (!started && audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+      }
+    }).catch(() => {
+      primed = false;
+      if (audio) audio.muted = false;
+    });
   }
 }
 
 function fadeTo(target: number, duration = 1.4): void {
   if (!audio) return;
-  if (fadeRaf) cancelAnimationFrame(fadeRaf);
-  const start = audio.volume;
-  const t0 = performance.now();
-  const durMs = Math.max(1, duration * 1000);
-  const step = (now: number): void => {
-    if (!audio) return;
-    const p = Math.min(1, (now - t0) / durMs);
-    const eased = Math.sin((p * Math.PI) / 2);
-    audio.volume = Math.min(1, Math.max(0, start + (target - start) * eased));
-    if (p < 1) fadeRaf = requestAnimationFrame(step);
-    else fadeRaf = 0;
-  };
-  fadeRaf = requestAnimationFrame(step);
+  anim.kill(audio);
+  anim.to(audio, { volume: target }, { duration, ease: 'outSine' });
 }
 
 export async function startMusic(): Promise<void> {
   if (!audio) return;
+  started = true;
   if (stopTimer) {
     window.clearTimeout(stopTimer);
     stopTimer = 0;
   }
-  if (playing && !audio.paused) {
+  if (playing && !audio.paused && !audio.muted) {
     setPressed(true);
-    disarmUnlock();
     return;
   }
   try {
-    if (audio.volume < 0.08) audio.volume = 0.08;
+    audio.muted = false;
+    anim.set(audio, { volume: 0 });
     await audio.play();
     playing = true;
-    disarmUnlock();
-    fadeTo(music.volume, 1.8);
+    fadeTo(music.volume, 2.2);
     setPressed(true);
   } catch {
+    try {
+      audio.muted = true;
+      anim.set(audio, { volume: 0 });
+      await audio.play();
+      audio.muted = false;
+      if (!audio.paused) {
+        playing = true;
+        fadeTo(music.volume, 2.2);
+        setPressed(true);
+        return;
+      }
+    } catch {
+      if (audio) audio.muted = false;
+    }
     playing = false;
     setPressed(false);
-    if (musicWanted()) armUnlock();
   }
 }
 
 function stopMusic(): void {
   if (!audio) return;
   playing = false;
-  disarmUnlock();
   saveMuted(true);
-  fadeTo(0, 0.5);
+  fadeTo(0, 0.6);
   if (stopTimer) window.clearTimeout(stopTimer);
   stopTimer = window.setTimeout(() => {
     stopTimer = 0;
     audio?.pause();
-  }, 550);
+  }, 650);
   setPressed(false);
 }
 
-/** Nhạc nền: Canon in D (public domain). Chỉ phát sau thao tác của khách. */
+/** Nhạc nền: Canon in D (public domain). Chỉ phát sau khi mở thiệp xong. */
 export function initMusic(): void {
   button = document.querySelector<HTMLButtonElement>('#music-toggle');
   audio = new Audio(asset(music.src));
   audio.loop = true;
   audio.preload = 'auto';
-  audio.volume = 0.08;
+  anim.set(audio, { volume: 0 });
   audio.title = music.title;
 
   try {
@@ -128,6 +130,14 @@ export function initMusic(): void {
     sessionStorage.removeItem(LEGACY_KEY);
   } catch {
     /* chế độ riêng tư: bỏ qua */
+  }
+
+  audio.addEventListener('pause', () => {
+    if (musicWanted()) playing = false;
+  });
+
+  for (const type of GESTURE_EVENTS) {
+    window.addEventListener(type, onGesture, { capture: true, passive: true });
   }
 
   button?.addEventListener('click', () => {
@@ -140,9 +150,24 @@ export function initMusic(): void {
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (!audio || !playing || audio.paused) return;
-    if (document.hidden) fadeTo(0, 0.4);
-    else fadeTo(music.volume, 1.2);
+    if (!audio) return;
+    if (document.hidden) {
+      if (!audio.paused) fadeTo(0, 0.4);
+    } else if (started && musicWanted()) {
+      if (audio.paused) {
+        playing = false;
+        void startMusic();
+      } else {
+        fadeTo(music.volume, 1.2);
+      }
+    }
+  });
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted && started && musicWanted() && audio?.paused) {
+      playing = false;
+      void startMusic();
+    }
   });
 }
 
