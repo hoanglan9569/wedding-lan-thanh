@@ -9,17 +9,21 @@ const base = (process.argv[2] ?? 'http://127.0.0.1:4173').replace(/\/$/, '');
 const NAMES = 'Anh Nam và gia đình\n\nCô Tư\ncô tư\nBạn Minh <b>';
 
 async function checkGenerator(page: Page, label: string): Promise<string> {
-  await page.goto(`${base}/moi.html`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/moi.html`, { waitUntil: 'load' });
+  await page.locator('#names').waitFor();
   await page.evaluate(() => localStorage.clear());
-  await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'load' });
+  await page.locator('#names').waitFor();
   await page.fill('#names', NAMES);
+  await page.waitForFunction(() => document.querySelectorAll('#out .item').length === 3);
   const rows = await page.locator('#out .item').count();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
   const href = await page.locator('#out .item a').first().getAttribute('href');
-  await page.screenshot({ path: `out-moi-${label}.png`, fullPage: true });
+  await page.screenshot({ path: `${process.env.TEMP ?? '/tmp'}/out-moi-${label}.png`, fullPage: true });
   if (rows !== 3) throw new Error(`${label}: expected 3 rows, got ${rows}`);
   if (overflow > 0) throw new Error(`${label}: ${overflow}px horizontal overflow`);
-  await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => document.querySelectorAll('#out .item').length === 3);
   const kept = await page.locator('#out .item').count();
   if (kept !== 3) throw new Error(`${label}: list not kept after reload (${kept})`);
   console.log(`${label}: 3 rows, 0px overflow, list kept after reload, first link ${href}`);
@@ -27,7 +31,8 @@ async function checkGenerator(page: Page, label: string): Promise<string> {
 }
 
 async function checkInvitation(page: Page, href: string): Promise<void> {
-  await page.goto(href, { waitUntil: 'networkidle' });
+  await page.goto(href, { waitUntil: 'load' });
+  await page.waitForFunction(() => Boolean(document.documentElement.dataset.engine));
   const shown = await page.locator('#intro-guest, #card-guest').first().textContent();
   if (shown?.trim() !== 'Anh Nam và gia đình') throw new Error(`invitation shows "${shown}"`);
   console.log(`invitation: shows "${shown?.trim()}"`);

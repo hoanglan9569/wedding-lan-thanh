@@ -22,14 +22,16 @@ interface Result {
   frames: number;
 }
 
+const pause = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function warmScroll(page: Page): Promise<void> {
   for (let i = 0; i < 24; i += 1) {
     await page.mouse.wheel(0, 420);
-    await page.waitForTimeout(60);
+    await pause(60);
   }
   for (let i = 0; i < 24; i += 1) {
     await page.mouse.wheel(0, -420);
-    await page.waitForTimeout(60);
+    await pause(60);
   }
 }
 
@@ -37,6 +39,10 @@ async function measure(url: string): Promise<Result> {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.goto(url, { waitUntil: 'load' });
+  await page.waitForFunction(() => {
+    const env = document.querySelector('#env');
+    return Boolean(document.documentElement.dataset.engine && env && getComputedStyle(env).opacity === '1');
+  });
   const { jsBytes, wasmBytes } = await page.evaluate(() => {
     let js = 0;
     let wasm = 0;
@@ -49,13 +55,12 @@ async function measure(url: string): Promise<Result> {
   });
   const engine = await page.evaluate(() => document.documentElement.dataset.engine ?? 'none');
   console.log(`  engine: ${engine}`);
-  await page.waitForTimeout(600);
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Performance.enable');
   const before = await cdp.send('Performance.getMetrics');
 
   await page.click('#intro-open');
-  await page.waitForTimeout(3600);
+  await page.waitForFunction(() => document.documentElement.classList.contains('is-open') && !document.querySelector('#intro'));
   await page.evaluate(() => {
     const w = window as unknown as { __frames?: number };
     w.__frames = 0;
@@ -66,7 +71,7 @@ async function measure(url: string): Promise<Result> {
     requestAnimationFrame(tick);
   });
   await warmScroll(page);
-  await page.waitForTimeout(1500);
+  await pause(1500);
 
   const after = await cdp.send('Performance.getMetrics');
   const frames = await page.evaluate(() => (window as unknown as { __frames?: number }).__frames ?? 0);

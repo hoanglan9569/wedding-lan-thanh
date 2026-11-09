@@ -17,8 +17,11 @@ let bad = 0;
 for (const [label, opts] of Object.entries(sizes)) {
   const page = await (await browser.newContext(opts)).newPage();
   for (const [i, n] of names.entries()) {
-    await page.goto(`${base}/?to=${n}`, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1500);
+    await page.goto(`${base}/?to=${n}`, { waitUntil: 'load' });
+    await page.waitForFunction(() => {
+      const env = document.querySelector('#env');
+      return Boolean(document.documentElement.dataset.engine && env && getComputedStyle(env).opacity === '1');
+    });
     const r = await page.evaluate(() => {
       const g = document.querySelector('#intro-guest')!.getBoundingClientRect();
       const to = document.querySelector('.env__to')!.getBoundingClientRect();

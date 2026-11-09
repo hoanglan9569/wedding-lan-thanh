@@ -65,10 +65,12 @@ async function measure(page: Page): Promise<string[]> {
   });
 }
 
+const pause = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function openCard(page: Page): Promise<void> {
   await page.waitForSelector('#intro-open', { timeout: 15000 });
   await page.click('#intro-open');
-  await page.waitForTimeout(3500);
+  await page.waitForFunction(() => document.documentElement.classList.contains('is-open') && !document.querySelector('#intro'));
 }
 
 /** Cuộn hết trang một lượt để mọi hiệu ứng xuất hiện đã chạy xong. */
@@ -81,13 +83,13 @@ async function warmUp(page: Page): Promise<void> {
       return window.scrollY + window.innerHeight >= document.body.scrollHeight - 4;
     }, 320);
     await page.mouse.wheel(0, 320);
-    await page.waitForTimeout(110);
+    await pause(110);
     if (atBottom) break;
   }
-  await page.waitForTimeout(1200);
+  await pause(1200);
   await page.mouse.wheel(0, -40000);
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(900);
+  await page.waitForFunction(() => window.scrollY < 4);
 }
 
 /**
@@ -191,7 +193,7 @@ async function shootSections(page: Page, view: string): Promise<string[]> {
     const el = page.locator(id).first();
     if (!(await el.count())) continue;
     await el.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(900);
+    await pause(900);
     const file = `${outDir}/${view}-${id.replace('#', '')}.jpg`;
     // Ảnh của cả khối: không cắt theo khung nhìn nên không báo lỗi giả.
     if (id === '#hero') await page.screenshot({ path: file, quality: 72, type: 'jpeg' });
@@ -215,8 +217,18 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   });
   page.on('pageerror', (err) => errors.push(`pageerror: ${err.message.slice(0, 200)}`));
 
-  await page.goto(url, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(2400); // để hiệu ứng mở màn chạy xong rồi mới chụp
+  await page.goto(url, { waitUntil: 'load' });
+  await page.waitForFunction(() => {
+    const env = document.querySelector('#env');
+    const hint = document.querySelector('#intro-hint');
+    return Boolean(
+      document.documentElement.dataset.engine &&
+        env &&
+        getComputedStyle(env).opacity === '1' &&
+        hint &&
+        getComputedStyle(hint).opacity === '1',
+    );
+  });
   const checks = await measure(page);
   await page.screenshot({ path: `${outDir}/${view}-intro.jpg`, quality: 72, type: 'jpeg' });
   await openCard(page);
@@ -228,7 +240,6 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   checks.push(`dấu tiếng Việt: ${marks.length ? marks.join(' | ') : 'đủ dấu'}`);
   // Tắt cuộn mượt: nó giành quyền cuộn với trình chụp nên ảnh ghép bị lệch.
   await page.evaluate(() => (window as unknown as { __scroll?: { disable(): void } }).__scroll?.disable());
-  await page.waitForTimeout(300);
   const shots = await shootSections(page, view);
 
   const overflow = await page.evaluate(
