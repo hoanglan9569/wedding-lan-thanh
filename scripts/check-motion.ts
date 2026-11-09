@@ -12,6 +12,8 @@
  * bun scripts/check-motion.ts [url]        (default http://127.0.0.1:4173/)
  */
 import { chromium, webkit, devices, type Browser, type BrowserContextOptions, type Page } from 'playwright';
+import { retryUntil } from './retry';
+import { Timeout } from './timeout';
 
 /** `system`: no emulation, the machine's own OS setting (the owner's PC reports reduce). */
 type Motion = 'reduce' | 'no-preference' | 'system';
@@ -43,7 +45,6 @@ const SCENARIOS: Scenario[] = [
   { engine: 'webkit', device: 'mobile', motion: 'no-preference' },
 ];
 
-const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 const present = (values: string[]): string[] => values.filter((v) => v !== 'gone');
 const distinct = (values: string[]): number => new Set(present(values)).size;
 const nums = (values: string[]): number[] => present(values).map(Number).filter(Number.isFinite);
@@ -86,17 +87,19 @@ async function sampleStyles(
   every: number,
   click?: string,
 ): Promise<string[][]> {
+  // last-resort: sample DOM computed styles over time inside page context during animation
   return page.evaluate(
     async ({ probes, total, every, click }) => {
       if (click) document.querySelector<HTMLElement>(click)?.click();
       const out = probes.map(() => [] as string[]);
       const t0 = performance.now();
+      const sleep = (d: number) => new Promise((done) => setTimeout(done, d));
       while (performance.now() - t0 <= total) {
         probes.forEach(([selector, prop], i) => {
           const el = document.querySelector(selector);
           out[i]!.push(el ? getComputedStyle(el)[prop] : 'gone');
         });
-        await new Promise((resolve) => setTimeout(resolve, every));
+        await sleep(every);
       }
       return out;
     },
@@ -105,6 +108,7 @@ async function sampleStyles(
 }
 
 async function checkBoot(page: Page, s: Scenario): Promise<Result[]> {
+  // last-resort: inspect prefers-reduced-motion query, html dataset engine, and recorded intro opacity frames
   const state = await page.evaluate(() => ({
     reduce: matchMedia('(prefers-reduced-motion: reduce)').matches,
     engine: document.documentElement.dataset.engine ?? '-',
@@ -124,6 +128,7 @@ async function checkBoot(page: Page, s: Scenario): Promise<Result[]> {
 }
 
 async function checkKenBurns(page: Page): Promise<Result> {
+  // last-resort: inspect running Web Animations API instances on hero image element
   const detail = await page.evaluate(() => {
     const img = document.querySelector('.hero__media img');
     const list = img?.getAnimations() ?? [];
@@ -141,7 +146,7 @@ async function checkOpening(page: Page): Promise<Result[]> {
     ['#intro', 'opacity'],
   ];
   const [flap = [], card = [], names = [], overlay = []] = await sampleStyles(page, probes, 4200, 100, '#intro-open');
-  await wait(400);
+  await page.locator('#intro').waitFor({ state: 'detached' });
   const gone = (await page.locator('#intro').count()) === 0;
   const fade = nums(overlay);
   return [
@@ -157,12 +162,14 @@ async function checkOpening(page: Page): Promise<Result[]> {
 }
 
 async function checkPetals(page: Page): Promise<Result> {
+  // last-resort: read 2D canvas pixel buffer across animation frames to verify petal movement
   const frames = await page.evaluate(async () => {
     const canvas = document.querySelector<HTMLCanvasElement>('#petals');
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx || !canvas.width) return null;
     const painted: number[] = [];
     const sums: number[] = [];
+    const sleep = (d: number) => new Promise((done) => setTimeout(done, d));
     for (let f = 0; f < 3; f += 1) {
       const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
       let n = 0;
@@ -175,7 +182,7 @@ async function checkPetals(page: Page): Promise<Result> {
       }
       painted.push(n);
       sums.push(sum);
-      await new Promise((resolve) => setTimeout(resolve, 220));
+      await sleep(220);
     }
     return { size: `${canvas.width}x${canvas.height}`, painted, moved: new Set(sums).size > 1 };
   });
@@ -185,6 +192,7 @@ async function checkPetals(page: Page): Promise<Result> {
 }
 
 async function checkReveal(page: Page, which: Which): Promise<Result> {
+  // last-resort: find reveal element below fold, tag it with data-probe, and compute page top offset
   const top = await page.evaluate((pick) => {
     const below = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]')).filter(
       (el) => !el.closest('.hero') && el.getBoundingClientRect().top > window.innerHeight,
@@ -198,7 +206,8 @@ async function checkReveal(page: Page, which: Which): Promise<Result> {
   }, which);
   const check = `reveal on scroll (${which} below the fold)`;
   if (top < 0) return { check, ok: false, detail: 'no reveal below the fold' };
-  // instant: with CSS scroll-behavior smooth, WebKit sometimes stops a long programmatic scroll short
+
+  // last-resort: instant programmatic scroll avoids WebKit smooth scroll stopping short
   await page.evaluate((y) => window.scrollTo({ top: Math.max(0, y - window.innerHeight * 0.5), behavior: 'instant' }), top);
   const [values = []] = await sampleStyles(page, [[`[data-probe="${which}"]`, 'opacity']], 1700, 80);
   const v = nums(values);
@@ -208,19 +217,31 @@ async function checkReveal(page: Page, which: Which): Promise<Result> {
 /** Desktop smooth scroll clamps the wheel to a measured page bottom: a stale bottom strands the
  *  guest at the guest book (owner bug 2026-11-06). Wheel from the top and require the real bottom. */
 async function checkWheelToFooter(page: Page): Promise<Result> {
+  // last-resort: reset scroll position to top instantly before mouse wheel simulation
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  await wait(400);
+  await retryUntil(
+    async () => {
+      // last-resort: check that scroll position reached 0
+      return page.evaluate(() => window.scrollY === 0);
+    },
+    { timeout: Timeout.SHORT },
+  );
   await page.mouse.move(720, 450);
   for (let i = 0; i < 120; i++) {
     await page.mouse.wheel(0, 500);
-    await wait(40);
   }
-  await wait(1500);
-  const r = await page.evaluate(() => ({
-    y: Math.round(window.scrollY),
-    max: document.documentElement.scrollHeight - window.innerHeight,
-    footer: Math.round(document.querySelector('.footer')!.getBoundingClientRect().top),
-  }));
+  const r = await retryUntil(
+    async () => {
+      // last-resort: read scrollY, scrollHeight, and footer bounding rect to verify bottom reached
+      const cur = await page.evaluate(() => ({
+        y: Math.round(window.scrollY),
+        max: document.documentElement.scrollHeight - window.innerHeight,
+        footer: Math.round(document.querySelector('.footer')!.getBoundingClientRect().top),
+      }));
+      return cur.y >= cur.max - 2 && cur.footer < 900 ? cur : false;
+    },
+    { timeout: Timeout.SHORT, message: 'mouse wheel did not reach footer' },
+  );
   return {
     check: 'mouse wheel reaches the footer',
     ok: r.y >= r.max - 2 && r.footer < 900,
@@ -229,21 +250,34 @@ async function checkWheelToFooter(page: Page): Promise<Result> {
 }
 
 async function checkReload(page: Page): Promise<Result[]> {
+  // last-resort: scroll instantly to bottom of document before triggering page reload
   await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
-  await wait(500);
-  const before = await page.evaluate(() => Math.round(window.scrollY));
+  const before = await retryUntil(
+    async () => {
+      // last-resort: read scrollY position to verify page was scrolled before reload
+      const y = await page.evaluate(() => Math.round(window.scrollY));
+      return y > 0 ? y : false;
+    },
+    { timeout: Timeout.SHORT },
+  );
   await page.reload({ waitUntil: 'load' });
-  await wait(1600);
-  const state = await page.evaluate(() => {
-    const rest = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]')).filter((el) => !el.closest('.hero'));
-    const hidden = rest.filter((el) => {
-      const kid = el.firstElementChild;
-      const target = el.dataset.reveal === 'stagger' && kid instanceof HTMLElement ? kid : el;
-      return Number(getComputedStyle(target).opacity) < 0.5;
-    }).length;
-    const env = (window as unknown as { __env?: string[] }).__env ?? [];
-    return { y: Math.round(window.scrollY), intro: !!document.querySelector('#intro'), hidden, total: rest.length, env };
-  });
+  const state = await retryUntil(
+    async () => {
+      // last-resort: inspect scroll position, intro element, and reveal element opacities after reload
+      const cur = await page.evaluate(() => {
+        const rest = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]')).filter((el) => !el.closest('.hero'));
+        const hidden = rest.filter((el) => {
+          const kid = el.firstElementChild;
+          const target = el.dataset.reveal === 'stagger' && kid instanceof HTMLElement ? kid : el;
+          return Number(getComputedStyle(target).opacity) < 0.5;
+        }).length;
+        const env = (window as unknown as { __env?: string[] }).__env ?? [];
+        return { y: Math.round(window.scrollY), intro: !!document.querySelector('#intro'), hidden, total: rest.length, env };
+      });
+      return cur.intro && cur.y === 0 && cur.hidden >= cur.total * 0.5 && cur.env.length >= 3 ? cur : false;
+    },
+    { timeout: Timeout.SHORT, message: 'reload state did not settle' },
+  );
   const ok = before > 0 && state.y === 0 && state.intro && state.hidden >= state.total * 0.5;
   return [
     {
@@ -259,6 +293,7 @@ async function checkScrollOrSwipeOpen(page: Page, s: Scenario): Promise<Result> 
   if (s.device === 'desktop') {
     await page.mouse.wheel(0, 120);
   } else {
+    // last-resort: dispatch synthesized touch events to test mobile swipe open gesture
     await page.evaluate(() => {
       const mk = (type: string, y: number): Event =>
         Object.assign(new Event(type, { bubbles: true }), {
@@ -269,10 +304,11 @@ async function checkScrollOrSwipeOpen(page: Page, s: Scenario): Promise<Result> 
       window.dispatchEvent(mk('touchend', 420));
     });
   }
-  await wait(3600);
-  const opened = await page.evaluate(() => !document.querySelector('#intro') && document.documentElement.classList.contains('is-open'));
+  await page.locator('html.is-open').waitFor();
+  await page.locator('#intro').waitFor({ state: 'detached' });
+  const opened = true;
   await page.reload({ waitUntil: 'load' });
-  await wait(400);
+  await page.locator('#intro').waitFor();
   return {
     check: s.device === 'desktop' ? 'mouse wheel opens the envelope' : 'touch swipe opens the envelope',
     ok: opened,
@@ -282,40 +318,41 @@ async function checkScrollOrSwipeOpen(page: Page, s: Scenario): Promise<Result> 
 
 async function checkMusicReload(page: Page): Promise<Result[]> {
   await page.click('#intro-open');
-  await wait(500);
-  const duringOpen = await page.evaluate(() => document.querySelector('#music-toggle')?.getAttribute('aria-pressed'));
-  await wait(3100);
-  const secondVisit = await page.evaluate(() => ({
-    pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
+  const duringOpen = await page.locator('#music-toggle').getAttribute('aria-pressed');
+  await page.locator('#music-toggle[aria-pressed="true"]').waitFor();
+  const secondPressed = await page.locator('#music-toggle').getAttribute('aria-pressed');
+  // last-resort: read music muted state from storage on second visit
+  const secondStorage = await page.evaluate(() => ({
     local: localStorage.getItem('lanthanh:music:muted'),
     session: sessionStorage.getItem('lanthanh:music:muted'),
   }));
-  await page.evaluate(() => document.querySelector<HTMLButtonElement>('#music-toggle')?.click());
-  await wait(100);
+  await page.locator('#music-toggle').click();
   await page.reload({ waitUntil: 'load' });
-  await wait(400);
+  await page.locator('#intro-open').waitFor();
   await page.click('#intro-open');
-  await wait(3600);
-  const mutedVisit = await page.evaluate(() => ({
-    pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
-    local: localStorage.getItem('lanthanh:music:muted'),
-  }));
+  await page.locator('html.is-open').waitFor();
+  await page.locator('#intro').waitFor({ state: 'detached' });
+  const mutedPressed = await page.locator('#music-toggle').getAttribute('aria-pressed');
+  // last-resort: read music muted state from localStorage after explicit mute
+  const mutedLocal = await page.evaluate(() => localStorage.getItem('lanthanh:music:muted'));
   return [
     {
       check: 'music plays after envelope finishes opening on revisit',
-      ok: duringOpen === 'false' && secondVisit.pressed === 'true' && secondVisit.local !== '1' && secondVisit.session !== '1',
-      detail: `during=${duringOpen} after=${secondVisit.pressed} local=${secondVisit.local}`,
+      ok: duringOpen === 'false' && secondPressed === 'true' && secondStorage.local !== '1' && secondStorage.session !== '1',
+      detail: `during=${duringOpen} after=${secondPressed} local=${secondStorage.local}`,
     },
     {
       check: 'music stays muted on next visit only after muting',
-      ok: mutedVisit.pressed === 'false' && mutedVisit.local === '1',
-      detail: `pressed=${mutedVisit.pressed} local=${mutedVisit.local}`,
+      ok: mutedPressed === 'false' && mutedLocal === '1',
+      detail: `pressed=${mutedPressed} local=${mutedLocal}`,
     },
   ];
 }
 
 async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
   const context = await browser.newContext(contextFor(s));
+  context.setDefaultTimeout(Timeout.DEFAULT);
+  context.setDefaultNavigationTimeout(Timeout.DEFAULT);
   await context.addInitScript(recordEntrance);
   const page = await context.newPage();
   const errors: string[] = [];
@@ -324,7 +361,15 @@ async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
     if (m.type() === 'error') errors.push(m.text());
   });
   await page.goto(url, { waitUntil: 'load' });
-  await wait(1800);
+  await page.locator('html[data-engine]').waitFor();
+  await retryUntil(
+    async () => {
+      // last-resort: poll recorded entrance animation opacity frames
+      const env = await page.evaluate(() => (window as unknown as { __env?: string[] }).__env ?? []);
+      return distinct(env) >= 3;
+    },
+    { timeout: Timeout.SHORT },
+  );
   const results = [...(await checkBoot(page, s)), await checkKenBurns(page), ...(await checkOpening(page))];
   results.push(await checkPetals(page));
   results.push(await checkReveal(page, 'first'));
@@ -341,7 +386,10 @@ async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
 /** What this machine's OS asks for, as Chromium reads it with emulation switched off. */
 async function osPreference(browser: Browser): Promise<string> {
   const context = await browser.newContext({ reducedMotion: null });
+  context.setDefaultTimeout(Timeout.DEFAULT);
+  context.setDefaultNavigationTimeout(Timeout.DEFAULT);
   const page = await context.newPage();
+  // last-resort: query OS prefers-reduced-motion media query via matchMedia with emulation off
   const reduce = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
   await context.close();
   return reduce ? 'reduce' : 'no-preference';

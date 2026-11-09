@@ -5,6 +5,8 @@
  */
 import { chromium, devices, type Page } from 'playwright';
 import { mkdir } from 'node:fs/promises';
+import { retryUntil } from './retry';
+import { Timeout } from './timeout';
 
 const url = process.argv[2] ?? 'http://127.0.0.1:4173/';
 const outDir = process.argv[3] ?? 'F:/work/deepseek-general/out/wedding-shots';
@@ -32,7 +34,8 @@ interface Report {
 
 /** Đo bằng số thay vì nhìn ảnh: nút mở thiệp, ảnh hero phủ kín, nhạc, album. */
 async function measure(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
+  // last-resort: measure DOM element bounding rects and computed opacity for intro/hero layout
+  const domStats = await page.evaluate(() => {
     const out: string[] = [];
     const paper = document.querySelector('.intro__paper');
     if (paper) {
@@ -59,17 +62,17 @@ async function measure(page: Page): Promise<string[]> {
       const gap = Math.round(hero.getBoundingClientRect().height - img.getBoundingClientRect().height);
       out.push(`hero phủ: thiếu ${gap}px (âm là dư, tốt)`);
     }
-    out.push(`album: ${document.querySelectorAll('#album-grid .shot').length} ảnh`);
-    out.push(`nút nhạc: ${document.querySelector('#music-toggle') ? 'có' : 'thiếu'}`);
     return out;
   });
+  const albumCount = await page.locator('#album-grid .shot').count();
+  const musicExists = (await page.locator('#music-toggle').count()) > 0;
+  return [...domStats, `album: ${albumCount} ảnh`, `nút nhạc: ${musicExists ? 'có' : 'thiếu'}`];
 }
 
-const pause = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-
 async function openCard(page: Page): Promise<void> {
-  await page.waitForSelector('#intro-open', { timeout: 15000 });
+  await page.locator('#intro-open').waitFor();
   await page.click('#intro-open');
+  // last-resort: wait for envelope opening animation to complete and intro overlay removal
   await page.waitForFunction(() => document.documentElement.classList.contains('is-open') && !document.querySelector('#intro'));
 }
 
@@ -78,17 +81,18 @@ async function warmUp(page: Page): Promise<void> {
   // Lăn chuột thật (cuộn mượt chỉ nhận wheel) và cả scrollTo cho ngữ cảnh cảm ứng.
   // Trang cao dần khi ảnh tải xong nên phải đo lại mỗi vòng, không tính trước.
   for (let step = 0; step < 80; step += 1) {
+    // last-resort: scroll page incrementally and check if reached page bottom
     const atBottom = await page.evaluate((delta) => {
       window.scrollBy(0, delta);
       return window.scrollY + window.innerHeight >= document.body.scrollHeight - 4;
     }, 320);
     await page.mouse.wheel(0, 320);
-    await pause(110);
     if (atBottom) break;
   }
-  await pause(1200);
   await page.mouse.wheel(0, -40000);
+  // last-resort: reset scroll position to top
   await page.evaluate(() => window.scrollTo(0, 0));
+  // last-resort: wait for scroll position to settle at top
   await page.waitForFunction(() => window.scrollY < 4);
 }
 
@@ -97,6 +101,7 @@ async function warmUp(page: Page): Promise<void> {
  * Phông nào vẽ thiếu dấu thì chiều cao bằng nhau: báo lỗi ngay tại đây.
  */
 async function diacritics(page: Page): Promise<string[]> {
+  // last-resort: measure 2D canvas text metrics for Vietnamese diacritics vertical ascents and descents
   return page.evaluate(() => {
     // 'duoi' = dấu nằm dưới chữ (nặng), phải đo phần chìm thay vì phần nhô
     const pairs: [string, string, 'tren' | 'duoi'][] = [
@@ -130,6 +135,7 @@ async function diacritics(page: Page): Promise<string[]> {
 
 /** Đo tương phản chữ trên nền theo công thức WCAG: dễ đọc mà không chói. */
 async function contrast(page: Page): Promise<string[]> {
+  // last-resort: compute WCAG contrast ratios by walking DOM background colors and computing relative luminance
   return page.evaluate(() => {
     const picks = [
       '.letter__text p',
@@ -173,6 +179,7 @@ async function contrast(page: Page): Promise<string[]> {
 
 /** Sau khi cuộn hết trang, không phần tử nào được phép còn mờ. */
 async function stillHidden(page: Page): Promise<string[]> {
+  // last-resort: query DOM elements with data-reveal to check computed style opacity after warmUp
   return page.evaluate(() => {
     const bad: string[] = [];
     document.querySelectorAll<HTMLElement>('[data-reveal], [data-split]').forEach((el) => {
@@ -193,7 +200,18 @@ async function shootSections(page: Page, view: string): Promise<string[]> {
     const el = page.locator(id).first();
     if (!(await el.count())) continue;
     await el.scrollIntoViewIfNeeded();
-    await pause(900);
+    await retryUntil(
+      async () => {
+        // last-resort: check if section reveal element has reached visible opacity
+        return el.evaluate((node) => {
+          const target = (node.dataset.reveal === 'stagger' && node.firstElementChild instanceof HTMLElement)
+            ? node.firstElementChild
+            : node;
+          return Number.parseFloat(getComputedStyle(target).opacity) >= 0.8;
+        });
+      },
+      { timeout: Timeout.VERY_SHORT },
+    ).catch(() => {});
     const file = `${outDir}/${view}-${id.replace('#', '')}.jpg`;
     // Ảnh của cả khối: không cắt theo khung nhìn nên không báo lỗi giả.
     if (id === '#hero') await page.screenshot({ path: file, quality: 72, type: 'jpeg' });
@@ -210,6 +228,8 @@ async function run(view: string, width: number, height: number, mobile: boolean)
       ? { ...devices['iPhone 13'], locale: 'vi-VN' }
       : { viewport: { width, height }, deviceScaleFactor: 1, locale: 'vi-VN' },
   );
+  context.setDefaultTimeout(Timeout.DEFAULT);
+  context.setDefaultNavigationTimeout(Timeout.DEFAULT);
   const page = await context.newPage();
   const errors: string[] = [];
   page.on('console', (msg) => {
@@ -218,6 +238,7 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   page.on('pageerror', (err) => errors.push(`pageerror: ${err.message.slice(0, 200)}`));
 
   await page.goto(url, { waitUntil: 'load' });
+  // last-resort: wait for WASM engine boot and intro envelope/hint computed opacity to reach 1
   await page.waitForFunction(() => {
     const env = document.querySelector('#env');
     const hint = document.querySelector('#intro-hint');
@@ -238,10 +259,11 @@ async function run(view: string, width: number, height: number, mobile: boolean)
   checks.push(`tương phản: ${(await contrast(page)).join(' · ')}`);
   const marks = await diacritics(page);
   checks.push(`dấu tiếng Việt: ${marks.length ? marks.join(' | ') : 'đủ dấu'}`);
-  // Tắt cuộn mượt: nó giành quyền cuộn với trình chụp nên ảnh ghép bị lệch.
+  // last-resort: access custom window.__scroll property to disable smooth scroll
   await page.evaluate(() => (window as unknown as { __scroll?: { disable(): void } }).__scroll?.disable());
   const shots = await shootSections(page, view);
 
+  // last-resort: measure document scrollWidth against clientWidth for horizontal overflow
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
