@@ -1,14 +1,16 @@
 import { music } from '../data/wedding';
-import * as anim from '../vendor/motion-core/anim';
 import { asset } from './gallery';
 
-const KEY = 'lanthanh:music';
-const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'] as const;
+const KEY = 'lanthanh:music:muted';
+const LEGACY_KEY = 'lanthanh:music';
+const UNLOCK_EVENTS = ['touchend', 'click', 'keydown'] as const;
 
 let audio: HTMLAudioElement | null = null;
 let button: HTMLButtonElement | null = null;
 let stopTimer = 0;
+let fadeRaf = 0;
 let unlockArmed = false;
+let playing = false;
 
 function setPressed(on: boolean): void {
   button?.setAttribute('aria-pressed', String(on));
@@ -17,9 +19,11 @@ function setPressed(on: boolean): void {
 
 function saveMuted(muted: boolean): void {
   try {
+    localStorage.removeItem(LEGACY_KEY);
+    sessionStorage.removeItem(LEGACY_KEY);
     if (muted) {
-      localStorage.setItem(KEY, 'off');
-      sessionStorage.setItem(KEY, 'off');
+      localStorage.setItem(KEY, '1');
+      sessionStorage.setItem(KEY, '1');
     } else {
       localStorage.removeItem(KEY);
       sessionStorage.removeItem(KEY);
@@ -56,8 +60,19 @@ function disarmUnlock(): void {
 
 function fadeTo(target: number, duration = 1.4): void {
   if (!audio) return;
-  anim.kill(audio);
-  anim.to(audio, { volume: target }, { duration, ease: 'outSine' });
+  if (fadeRaf) cancelAnimationFrame(fadeRaf);
+  const start = audio.volume;
+  const t0 = performance.now();
+  const durMs = Math.max(1, duration * 1000);
+  const step = (now: number): void => {
+    if (!audio) return;
+    const p = Math.min(1, (now - t0) / durMs);
+    const eased = Math.sin((p * Math.PI) / 2);
+    audio.volume = Math.min(1, Math.max(0, start + (target - start) * eased));
+    if (p < 1) fadeRaf = requestAnimationFrame(step);
+    else fadeRaf = 0;
+  };
+  fadeRaf = requestAnimationFrame(step);
 }
 
 export async function startMusic(): Promise<void> {
@@ -65,18 +80,21 @@ export async function startMusic(): Promise<void> {
   if (stopTimer) {
     window.clearTimeout(stopTimer);
     stopTimer = 0;
-  } else if (!audio.paused) {
+  }
+  if (playing && !audio.paused) {
     setPressed(true);
     disarmUnlock();
     return;
   }
   try {
-    anim.set(audio, { volume: 0 });
+    if (audio.volume < 0.08) audio.volume = 0.08;
     await audio.play();
+    playing = true;
     disarmUnlock();
-    fadeTo(music.volume, 2.2);
+    fadeTo(music.volume, 1.8);
     setPressed(true);
   } catch {
+    playing = false;
     setPressed(false);
     if (musicWanted()) armUnlock();
   }
@@ -84,14 +102,15 @@ export async function startMusic(): Promise<void> {
 
 function stopMusic(): void {
   if (!audio) return;
+  playing = false;
   disarmUnlock();
   saveMuted(true);
-  fadeTo(0, 0.6);
+  fadeTo(0, 0.5);
   if (stopTimer) window.clearTimeout(stopTimer);
   stopTimer = window.setTimeout(() => {
     stopTimer = 0;
     audio?.pause();
-  }, 650);
+  }, 550);
   setPressed(false);
 }
 
@@ -100,18 +119,19 @@ export function initMusic(): void {
   button = document.querySelector<HTMLButtonElement>('#music-toggle');
   audio = new Audio(asset(music.src));
   audio.loop = true;
-  audio.preload = 'none';
-  anim.set(audio, { volume: 0 });
+  audio.preload = 'auto';
+  audio.volume = 0.08;
   audio.title = music.title;
 
   try {
-    if (localStorage.getItem(KEY) !== 'off') sessionStorage.removeItem(KEY);
+    localStorage.removeItem(LEGACY_KEY);
+    sessionStorage.removeItem(LEGACY_KEY);
   } catch {
     /* chế độ riêng tư: bỏ qua */
   }
 
   button?.addEventListener('click', () => {
-    if (audio?.paused || stopTimer) {
+    if (!playing || audio?.paused || stopTimer) {
       saveMuted(false);
       void startMusic();
     } else {
@@ -120,7 +140,7 @@ export function initMusic(): void {
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (!audio || audio.paused) return;
+    if (!audio || !playing || audio.paused) return;
     if (document.hidden) fadeTo(0, 0.4);
     else fadeTo(music.volume, 1.2);
   });
@@ -128,7 +148,7 @@ export function initMusic(): void {
 
 export function musicWanted(): boolean {
   try {
-    return localStorage.getItem(KEY) !== 'off' && sessionStorage.getItem(KEY) !== 'off';
+    return localStorage.getItem(KEY) !== '1' && sessionStorage.getItem(KEY) !== '1';
   } catch {
     return true;
   }

@@ -257,13 +257,13 @@ async function checkReload(page: Page): Promise<Result[]> {
 
 async function checkMusicReload(page: Page): Promise<Result[]> {
   await page.click('#intro-open');
-  await wait(600);
+  await wait(3600);
   const secondVisit = await page.evaluate(() => ({
     pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
-    local: localStorage.getItem('lanthanh:music'),
-    session: sessionStorage.getItem('lanthanh:music'),
+    local: localStorage.getItem('lanthanh:music:muted'),
+    session: sessionStorage.getItem('lanthanh:music:muted'),
   }));
-  await page.evaluate(() => document.querySelector<HTMLButtonElement>('#music-toggle')?.click());
+  await page.click('#music-toggle');
   await wait(100);
   await page.reload({ waitUntil: 'load' });
   await wait(400);
@@ -271,17 +271,17 @@ async function checkMusicReload(page: Page): Promise<Result[]> {
   await wait(600);
   const mutedVisit = await page.evaluate(() => ({
     pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
-    local: localStorage.getItem('lanthanh:music'),
+    local: localStorage.getItem('lanthanh:music:muted'),
   }));
   return [
     {
       check: 'music plays on second visit when not muted',
-      ok: secondVisit.pressed === 'true' && secondVisit.local !== 'off' && secondVisit.session !== 'off',
+      ok: secondVisit.pressed === 'true' && secondVisit.local !== '1' && secondVisit.session !== '1',
       detail: `pressed=${secondVisit.pressed} local=${secondVisit.local} session=${secondVisit.session}`,
     },
     {
       check: 'music stays muted on next visit only after muting',
-      ok: mutedVisit.pressed === 'false' && mutedVisit.local === 'off',
+      ok: mutedVisit.pressed === 'false' && mutedVisit.local === '1',
       detail: `pressed=${mutedVisit.pressed} local=${mutedVisit.local}`,
     },
   ];

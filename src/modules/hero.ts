@@ -46,16 +46,13 @@ export function initHero(): void {
   });
 }
 
-/** Thanh điều hướng hiện ra sau khi rời hero. */
+/** Thanh điều hướng hiện ra ngay sau khi mở thiệp để khách thấy nút nhạc nền. */
 export function initTopbar(): void {
   const bar = document.querySelector<HTMLElement>('#topbar');
   const hero = document.querySelector<HTMLElement>('.hero');
   if (!bar || !hero) return;
-  const io = new IntersectionObserver(
-    ([entry]) => bar.classList.toggle('topbar--on', !(entry?.isIntersecting ?? true)),
-    { rootMargin: '-72% 0px 0px 0px', threshold: 0 },
-  );
-  io.observe(hero);
+  if (!document.querySelector('#intro')) bar.classList.add('topbar--on');
+  document.addEventListener('intro:done', () => bar.classList.add('topbar--on'), { once: true });
 }
 
 /** Mở màn sau khi bấm "Mở thiệp": tên và ngày bay vào. */

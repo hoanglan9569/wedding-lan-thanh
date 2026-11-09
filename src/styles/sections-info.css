@@ -283,6 +283,10 @@
   color: var(--ink-2);
 }
 
+.wishes__empty[hidden] {
+  display: none;
+}
+
 .wishes__empty p {
   font-family: var(--serif);
   font-style: italic;
