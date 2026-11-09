@@ -93,6 +93,7 @@ async function sampleStyles(
       if (click) document.querySelector<HTMLElement>(click)?.click();
       const out = probes.map(() => [] as string[]);
       const t0 = performance.now();
+      // last-resort: the pause runs inside the page, pacing the samples of a running animation
       const sleep = (d: number) => new Promise((done) => setTimeout(done, d));
       while (performance.now() - t0 <= total) {
         probes.forEach(([selector, prop], i) => {
@@ -169,6 +170,7 @@ async function checkPetals(page: Page): Promise<Result> {
     if (!canvas || !ctx || !canvas.width) return null;
     const painted: number[] = [];
     const sums: number[] = [];
+    // last-resort: the pause runs inside the page, between petal canvas frames being read
     const sleep = (d: number) => new Promise((done) => setTimeout(done, d));
     for (let f = 0; f < 3; f += 1) {
       const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
