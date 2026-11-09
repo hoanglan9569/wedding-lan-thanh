@@ -140,7 +140,7 @@ async function checkOpening(page: Page): Promise<Result[]> {
     ['.hero__name', 'opacity'],
     ['#intro', 'opacity'],
   ];
-  const [flap = [], card = [], names = [], overlay = []] = await sampleStyles(page, probes, 3800, 100, '#intro-open');
+  const [flap = [], card = [], names = [], overlay = []] = await sampleStyles(page, probes, 4200, 100, '#intro-open');
   await wait(400);
   const gone = (await page.locator('#intro').count()) === 0;
   const fade = nums(overlay);
@@ -255,6 +255,38 @@ async function checkReload(page: Page): Promise<Result[]> {
   ];
 }
 
+async function checkMusicReload(page: Page): Promise<Result[]> {
+  await page.click('#intro-open');
+  await wait(600);
+  const secondVisit = await page.evaluate(() => ({
+    pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
+    local: localStorage.getItem('lanthanh:music'),
+    session: sessionStorage.getItem('lanthanh:music'),
+  }));
+  await page.evaluate(() => document.querySelector<HTMLButtonElement>('#music-toggle')?.click());
+  await wait(100);
+  await page.reload({ waitUntil: 'load' });
+  await wait(400);
+  await page.click('#intro-open');
+  await wait(600);
+  const mutedVisit = await page.evaluate(() => ({
+    pressed: document.querySelector('#music-toggle')?.getAttribute('aria-pressed'),
+    local: localStorage.getItem('lanthanh:music'),
+  }));
+  return [
+    {
+      check: 'music plays on second visit when not muted',
+      ok: secondVisit.pressed === 'true' && secondVisit.local !== 'off' && secondVisit.session !== 'off',
+      detail: `pressed=${secondVisit.pressed} local=${secondVisit.local} session=${secondVisit.session}`,
+    },
+    {
+      check: 'music stays muted on next visit only after muting',
+      ok: mutedVisit.pressed === 'false' && mutedVisit.local === 'off',
+      detail: `pressed=${mutedVisit.pressed} local=${mutedVisit.local}`,
+    },
+  ];
+}
+
 async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
   const context = await browser.newContext(contextFor(s));
   await context.addInitScript(recordEntrance);
@@ -272,6 +304,7 @@ async function runScenario(browser: Browser, s: Scenario): Promise<Result[]> {
   results.push(await checkReveal(page, 'last'));
   if (s.device === 'desktop') results.push(await checkWheelToFooter(page));
   results.push(...(await checkReload(page)));
+  results.push(...(await checkMusicReload(page)));
   results.push({ check: 'no console errors', ok: errors.length === 0, detail: errors.join(' | ').slice(0, 200) || 'none' });
   await context.close();
   return results;

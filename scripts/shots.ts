@@ -68,7 +68,7 @@ async function measure(page: Page): Promise<string[]> {
 async function openCard(page: Page): Promise<void> {
   await page.waitForSelector('#intro-open', { timeout: 15000 });
   await page.click('#intro-open');
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(3500);
 }
 
 /** Cuộn hết trang một lượt để mọi hiệu ứng xuất hiện đã chạy xong. */

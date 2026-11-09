@@ -84,6 +84,7 @@ function entrance(overlay: HTMLElement): void {
 /** Mở được bằng ba cách: bấm dấu niêm phong, cuộn xuống, hoặc bàn phím. */
 function bindOpeners(overlay: HTMLElement, open: () => void): () => void {
   const seal = overlay.querySelector<HTMLElement>('#intro-open');
+  const env = overlay.querySelector<HTMLElement>('#env');
   let touchStart = 0;
 
   const onWheel = (event: WheelEvent): void => {
@@ -101,6 +102,7 @@ function bindOpeners(overlay: HTMLElement, open: () => void): () => void {
   };
 
   seal?.addEventListener('click', open);
+  env?.addEventListener('click', open);
   window.addEventListener('wheel', onWheel, { passive: true });
   window.addEventListener('touchstart', onTouchStart, { passive: true });
   window.addEventListener('touchmove', onTouchMove, { passive: true });
@@ -108,6 +110,7 @@ function bindOpeners(overlay: HTMLElement, open: () => void): () => void {
 
   return () => {
     seal?.removeEventListener('click', open);
+    env?.removeEventListener('click', open);
     window.removeEventListener('wheel', onWheel);
     window.removeEventListener('touchstart', onTouchStart);
     window.removeEventListener('touchmove', onTouchMove);
@@ -128,6 +131,7 @@ export function initIntro(): void {
     if (opened) return;
     opened = true;
     unbind();
+    if (musicWanted()) void startMusic();
     if (animated) openSequence(overlay, () => finish(overlay, false));
     else finish(overlay, true);
   };
